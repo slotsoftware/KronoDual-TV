@@ -3,27 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Krono Personal TV</title>
+    <title>Admin Krono Dual TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* ESTILO GOLD / DUAL */
         body { background-color: #0f172a; font-family: sans-serif; color: white; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .input-dark { background: #1e293b; border: 1px solid #475569; color: white; outline: none; transition: 0.3s; }
-        .input-dark:focus { border-color: #94a3b8; box-shadow: 0 0 10px rgba(148, 163, 184, 0.3); } /* Foco plateado */
         
-        /* ESTILOS PARA LA TABLA DE HISTORIAL */
+        .glass { 
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(234, 179, 8, 0.2); 
+        }
+        
+        .input-dark { 
+            background: #1e293b; 
+            border: 1px solid #475569; 
+            color: white; 
+            outline: none; 
+            transition: 0.3s; 
+        }
+        .input-dark:focus { 
+            border-color: #eab308; /* Amarillo */
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); 
+        }
+        
         .history-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
-        .history-table th { text-align: left; padding: 10px; border-bottom: 1px solid #475569; color: #94a3b8; }
+        .history-table th { text-align: left; padding: 10px; border-bottom: 1px solid #334155; color: #94a3b8; }
         .history-table td { padding: 10px; border-bottom: 1px solid #1e293b; }
     </style>
 </head>
 <body class="min-h-screen p-2 relative">
 
-    <!-- ALERTA PERSONALIZADA (Reemplazo de alert() nativo) -->
+    <!-- ALERTA PERSONALIZADA (Reemplazo de alert() nativo para el visor) -->
     <div id="custom-alert" class="hidden fixed inset-0 bg-slate-900/90 z-[100] flex flex-col items-center justify-center p-4">
-        <div class="glass p-6 rounded-xl border border-slate-500/50 w-full max-w-sm text-center shadow-2xl">
-            <i class="fas fa-exclamation-circle text-4xl text-slate-400 mb-4"></i>
+        <div class="glass p-6 rounded-xl border border-red-500/50 w-full max-w-sm text-center shadow-2xl">
+            <i class="fas fa-exclamation-triangle text-4xl text-yellow-500 mb-4"></i>
             <p id="custom-alert-msg" class="text-white text-sm mb-6"></p>
             <button onclick="document.getElementById('custom-alert').classList.add('hidden')" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition border border-slate-500">ACEPTAR</button>
         </div>
@@ -32,12 +47,12 @@
     <!-- 1. PANTALLA DE BLOQUEO -->
     <div id="login-overlay" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-4">
         <div class="glass p-8 rounded-2xl w-full max-w-sm text-center shadow-2xl border border-slate-700">
-            <i class="fas fa-user-lock text-5xl text-slate-400 mb-6"></i>
-            <h2 class="text-xl font-bold mb-4">Admin Krono TV</h2>
+            <i class="fas fa-user-lock text-5xl text-yellow-500 mb-6"></i>
+            <h2 class="text-xl font-bold mb-4 text-yellow-500 uppercase">Admin Krono Dual TV</h2>
             <input type="password" id="admin-pass" class="w-full input-dark p-3 rounded-lg mb-4 text-center" placeholder="Contraseña">
-            <button onclick="checkPass()" class="w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 rounded-lg transition">ENTRAR</button>
+            <button onclick="checkPass()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-black font-bold py-3 rounded-lg transition shadow-lg shadow-yellow-900/20">ENTRAR</button>
             <p id="login-msg" class="text-red-400 text-xs mt-3 hidden">Contraseña incorrecta</p>
-            <p id="auth-status" class="text-xs text-slate-500 mt-2">Conectando...</p>
+            <p id="auth-status" class="text-xs text-slate-500 mt-2">Estado: Esperando...</p>
         </div>
     </div>
 
@@ -46,31 +61,29 @@
         
         <!-- CABECERA -->
         <header class="text-center py-4">
-            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 uppercase">KRONO TV MANAGER</h1>
-            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Gestión de Licencias TV (10€)</p>
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500 uppercase">KRONO DUAL TV</h1>
+            <p class="text-[10px] text-yellow-600 uppercase tracking-widest mt-1 font-bold">Gestión de Licencias Gold (15€)</p>
         </header>
 
-        <!-- CONTADOR DE INTERESADOS -->
-        <div class="glass p-4 rounded-xl border-l-4 border-slate-400 flex items-center justify-between">
+        <!-- CONTADOR INTERESADOS -->
+        <div class="glass p-4 rounded-xl border-l-4 border-yellow-500 flex items-center justify-between">
             <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase">Clientes Interesados</h3>
-                <p class="text-[10px] text-slate-500">Han pulsado "Solicitar"</p>
+                <h3 class="text-xs font-bold text-yellow-100 uppercase">Clientes Interesados</h3>
+                <p class="text-[10px] text-slate-400">Han pulsado "Solicitar"</p>
             </div>
             <div class="text-right">
-                <span id="clicks-counter" class="text-3xl font-black text-white">--</span>
-                <i class="fas fa-users text-slate-600 ml-2"></i>
+                <span id="clicks-counter" class="text-3xl font-black text-yellow-400">--</span>
+                <i class="fas fa-users text-yellow-600 ml-2"></i>
             </div>
         </div>
 
         <!-- FASE 1: PEDIR PAGO -->
         <div class="glass rounded-xl p-5 border border-slate-600/30 relative">
-            <div class="absolute top-0 right-0 bg-slate-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl">PASO 1</div>
-            <h2 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-comment-dollar mr-2"></i>Enviar Instrucciones (10€)</h2>
-            
+            <div class="absolute top-0 right-0 bg-yellow-600 text-black text-[10px] font-bold px-2 py-1 rounded-bl">PASO 1</div>
+            <h2 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-comment-dollar mr-2 text-yellow-500"></i>Enviar Instrucciones (15€)</h2>
             <input type="email" id="client-email-1" class="w-full input-dark rounded p-2 text-sm mb-3" placeholder="Correo del interesado...">
-            
-            <button onclick="sendPaymentRequest()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded text-sm flex justify-center gap-2 border border-slate-500">
-                <i class="fas fa-paper-plane text-slate-300"></i> ENVIAR DATOS PAGO
+            <button onclick="sendPaymentRequest()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded text-sm flex justify-center gap-2 border border-slate-500 hover:border-yellow-500/50 transition">
+                <i class="fas fa-paper-plane text-yellow-400"></i> ENVIAR DATOS PAGO
             </button>
         </div>
 
@@ -80,25 +93,24 @@
             <h2 class="text-sm font-bold text-emerald-400 mb-3"><i class="fas fa-gift mr-2"></i>Generar y Entregar</h2>
             
             <div class="space-y-3">
-                <input type="hidden" id="app-id" value="app_krono_tv"> <!-- ID FIJO TV -->
+                <input type="hidden" id="app-id" value="app_kronodual_tv">
                 
                 <div>
                     <label class="text-[10px] text-gray-400 font-bold uppercase">Correo Cliente (Pagado)</label>
-                    <input type="email" id="client-email-2" class="w-full input-dark rounded p-2 text-sm focus:border-emerald-500 font-mono">
+                    <input type="email" id="client-email-2" class="w-full input-dark rounded p-2 text-sm focus:border-emerald-500 font-mono" placeholder="cliente@email.com">
                 </div>
                 
-                <button onclick="generateAndSave()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded shadow-lg text-sm mt-2">
+                <button onclick="generateAndSave()" id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded shadow-lg text-sm mt-2 transition transform active:scale-95">
                     <i class="fas fa-cogs mr-1"></i> GUARDAR Y PREPARAR ENTREGA
                 </button>
                 
                 <!-- ZONA DE ENTREGA (OCULTA) -->
-                <div id="delivery-section" class="hidden pt-4 mt-2 border-t border-slate-700/50">
-                    <div class="bg-slate-900 p-2 rounded mb-3 text-center border border-slate-700">
+                <div id="delivery-section" class="hidden pt-4 mt-2 border-t border-slate-700/50 text-center">
+                    <div class="bg-slate-900 p-2 rounded mb-3 border border-slate-700">
                         <p class="text-[10px] text-slate-400">CLAVE GENERADA:</p>
-                        <p id="display-code" class="text-xl font-mono text-slate-200 font-bold tracking-widest select-all">---</p>
+                        <p id="display-code" class="text-xl font-mono text-yellow-400 font-bold tracking-widest select-all">---</p>
                     </div>
-
-                    <a id="btn-send-delivery" href="#" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded text-center shadow-lg border border-blue-400 text-sm">
+                    <a id="btn-send-delivery" href="#" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded shadow-lg text-sm">
                         <i class="fas fa-envelope-open-text mr-2"></i> ABRIR CORREO Y ENVIAR
                     </a>
                     <p id="status" class="text-center text-xs text-emerald-400 mt-2 font-bold"></p>
@@ -117,8 +129,8 @@
             </div>
         </div>
         
-        <div class="text-center pt-4 pb-6">
-             <button onclick="logout()" class="text-slate-500 hover:text-white transition text-xs"><i class="fas fa-power-off mr-1"></i> Cerrar Sesión</button>
+        <div class="text-center pt-4">
+             <button onclick="logout()" class="text-slate-500 hover:text-yellow-400 transition text-xs"><i class="fas fa-power-off mr-1"></i> Cerrar Sesión</button>
         </div>
     </div>
 
@@ -127,19 +139,15 @@
         import { getFirestore, collection, addDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Función personalizada para alertas
+        // Función personalizada para alertas (necesaria en entornos integrados)
         window.showAlert = function(msg) {
             document.getElementById('custom-alert-msg').textContent = msg;
             document.getElementById('custom-alert').classList.remove('hidden');
         };
 
-        // DATOS FIJOS TV
-        const PRECIO = "10€";
-        const APP_ID = "app_krono_tv"; // ID DE KRONO PERSONAL TV
-        
-        // Detectar URL de la App
-        const BASE_URL = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
-        const CLIENT_URL = `${BASE_URL}/index.html`; 
+        // CONFIGURACIÓN KRONODUAL
+        const APP_ID = "app_kronodual_tv";  // VINCLULADO A LA NUEVA BASE DE DATOS DUAL
+        const PRECIO = "15 euros";          // PRECIO ACTUALIZADO
 
         const firebaseConfig = {
           apiKey: "AIzaSyDW-2Yc4kvZJYbNOVeesPZWdRThYe0noUI",
@@ -155,11 +163,15 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        const BASE_URL = window.location.href.substring(0, window.location.href.lastIndexOf('/'));
+        const CLIENT_URL = `${BASE_URL}/index.html`; // VINCULADO AL ARCHIVO DEL CLIENTE ORIGINAL
+
         // --- SEGURIDAD AUTOMÁTICA ---
         (async function initSecurity() {
             try {
+                // ESTO ES LA CLAVE PARA QUE FUNCIONE CON TUS NUEVAS REGLAS
                 await signInAnonymously(auth);
-                document.getElementById('auth-status').textContent = "Conectado Seguro";
+                document.getElementById('auth-status').textContent = "Conectado";
                 document.getElementById('auth-status').className = "text-xs text-green-500 mt-2 font-bold";
             } catch(e) { 
                 console.error("Error Auth:", e); 
@@ -168,26 +180,23 @@
             }
         })();
 
-        // --- SEGURIDAD LOGIN (CONTRASEÑA SIMPLE) ---
         window.checkPass = function() {
-            const pass = document.getElementById('admin-pass').value;
-            if(pass === "admin123") {
+            if(document.getElementById('admin-pass').value === "admin123") {
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-panel').classList.remove('hidden');
                 
-                // Cargar estadísticas e historial al iniciar sesión
                 initStats();
                 loadHistory();
             } else {
                 document.getElementById('login-msg').classList.remove('hidden');
             }
         }
+
         window.logout = function() { location.reload(); }
 
-        // --- ESTADÍSTICAS CORREGIDAS ---
         function initStats() {
             try {
-                // Se añade 'general' para referirse a un documento específico válido
+                // CORRECCIÓN: doc() necesita un número par de segmentos apuntando a un documento específico (añadido 'general')
                 onSnapshot(doc(db, 'artifacts', APP_ID, 'public', 'data', 'stats', 'general'), (docSnap) => {
                     if (docSnap.exists()) {
                         document.getElementById('clicks-counter').textContent = docSnap.data()?.purchase_clicks || 0;
@@ -198,12 +207,11 @@
                     console.error("Error cargando estadísticas:", error);
                     document.getElementById('clicks-counter').textContent = "Err";
                 });
-            } catch(e) { 
-                console.error("Excepción en initStats:", e); 
+            } catch(e) {
+                console.error("Excepción en initStats:", e);
             }
         }
 
-        // --- HISTORIAL DE LICENCIAS ---
         function loadHistory() {
             try {
                 onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), (snap) => {
@@ -211,44 +219,28 @@
                     body.innerHTML = "";
                     snap.docs.forEach(d => {
                         const data = d.data();
-                        body.innerHTML += `<tr>
-                            <td>${data.email}</td>
-                            <td class="font-mono text-slate-300 font-bold">${data.code}</td>
-                            <td>${data.current_session_sensor || data.current_session_tv ? 'Activo' : '-'}</td>
-                        </tr>`;
+                        // Actualizado para buscar las sesiones de Sensor o TV de la versión Dual
+                        const isActive = (data.current_session_tv || data.current_session_sensor) ? 'Activo' : '-';
+                        body.innerHTML += `<tr><td>${data.email}</td><td class="font-mono text-yellow-500">${data.code}</td><td>${isActive}</td></tr>`;
                     });
                 });
-            } catch(e) {
-                console.error("Error cargando historial:", e);
-            }
+            } catch(e) {}
         }
 
-        // --- FASE 1: ENVIAR DATOS DE PAGO ---
         window.sendPaymentRequest = function() {
             const email = document.getElementById('client-email-1').value;
-            if(!email) return showAlert("Escribe el correo del interesado.");
-            
-            const subject = encodeURIComponent("Instrucciones Pago Krono Personal TV");
-            
-            // CORREO INSTRUCCIONES 10€
-            const body = `Hola ${email},%0D%0A%0D%0APara activar tu licencia de Krono Personal TV, los pasos son:%0D%0A%0D%0A1. Importe: ${PRECIO}%0D%0A2. Realiza el pago (Bizum/Transferencia) según lo acordado.%0D%0A%0D%0AEnvíame el justificante respondiendo a este correo y recibirás tu clave de activación inmediata.%0D%0A%0D%0AGracias.`;
-            
+            if(!email) return showAlert("Escribe el correo.");
+            const subject = encodeURIComponent("Instrucciones Pago Krono Dual TV GOLD");
+            const body = `Hola ${email},%0D%0A%0D%0APara activar tu licencia GOLD de Krono Dual TV (${PRECIO}), los pasos son:%0D%0A%0D%0A1. Importe: ${PRECIO}%0D%0A2. Realiza el pago (Bizum/Transferencia) según lo acordado.%0D%0A%0D%0AEnvíame el justificante respondiendo a este correo y recibirás tu clave de activación inmediata.%0D%0A%0D%0AGracias.`;
             window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
             document.getElementById('client-email-2').value = email;
         }
 
-        // --- FASE 2: GENERAR Y GUARDAR ---
         window.generateAndSave = async function() {
             const email = document.getElementById('client-email-2').value.trim();
             const btn = document.getElementById('btn-save');
-            const status = document.getElementById('status');
-            const deliverySection = document.getElementById('delivery-section');
-            const btnSend = document.getElementById('btn-send-delivery');
-
-            if(!email) return showAlert("Falta el correo del cliente.");
-            
-            btn.disabled = true; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GENERANDO...';
+            if(!email) return showAlert("Falta el correo.");
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GENERANDO...';
 
             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
             let code = "";
@@ -257,35 +249,22 @@
             for(let i=0; i<3; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
 
             try {
-                // Escritura segura
-                await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), {
-                    email: email, 
-                    code: code, 
-                    active: true, 
-                    createdAt: new Date().toISOString()
-                });
-
-                status.textContent = "✅ Licencia Guardada";
-                status.className = "text-center text-xs text-emerald-400 mt-2 font-bold";
+                // Escritura protegida (requiere signInAnonymously previo)
+                await addDoc(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), { email: email, code: code, active: true, createdAt: new Date().toISOString() });
+                
                 document.getElementById('display-code').textContent = code;
-
-                const subject = encodeURIComponent("Tu Licencia Krono Personal TV - Activada");
+                document.getElementById('status').innerText = "✅ Guardado";
                 
-                // CORREO ENTREGA
+                const subject = encodeURIComponent("Tu Licencia Krono Dual TV GOLD - Activada");
                 const bodyText = `SlotCarHome le da las gracias por confiar en nuestro producto.%0D%0A%0D%0APago recibido correctamente. Aquí tienes tu acceso:%0D%0A%0D%0A📧 Usuario: ${email}%0D%0A🔑 CLAVE: ${code}%0D%0A%0D%0A👉 Entra aquí: ${CLIENT_URL}%0D%0A%0D%0AGracias por tu confianza!`;
-                
-                btnSend.href = `mailto:${email}?subject=${subject}&body=${bodyText}`;
-                deliverySection.classList.remove('hidden');
-                document.getElementById('client-email-1').value = "";
-
+                document.getElementById('btn-send-delivery').href = `mailto:${email}?subject=${subject}&body=${bodyText}`;
+                document.getElementById('delivery-section').classList.remove('hidden');
             } catch (error) { 
-                console.error(error); 
-                status.textContent = "❌ Error: " + error.message; 
-                status.className = "text-red-400 text-xs font-bold mt-2";
+                console.error(error);
+                showAlert("Error al guardar: " + error.message); 
+                document.getElementById('status').innerText = "❌ Error";
             }
-            
-            btn.disabled = false; 
-            btn.innerHTML = '<i class="fas fa-cogs mr-1"></i> GUARDAR Y PREPARAR ENTREGA';
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-cogs mr-1"></i> GUARDAR Y PREPARAR ENTREGA';
         }
     </script>
 </body>
