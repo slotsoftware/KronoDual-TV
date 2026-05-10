@@ -125,7 +125,7 @@
         #roi-p2 .resize-handle { background-color: #f97316; }
 
         #config-panel { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); max-height: 0; overflow: hidden; opacity: 0; transform: translateY(-30px); padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0; border-width: 0; }
-        #config-panel.open { max-height: 1000px; opacity: 1; transform: translateY(0); padding: 12px; margin-top: 8px; margin-bottom: 8px; border-width: 1px; }
+        #config-panel.open { max-height: 85vh; overflow-y: auto; opacity: 1; transform: translateY(0); padding: 12px; margin-top: 8px; margin-bottom: 8px; border-width: 1px; }
         
         .btn-adjust { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; box-shadow: 0 2px 2px rgba(0,0,0,0.1); width: 1.5rem; height: 1.5rem; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
         .btn-adjust:active { background: rgba(255,255,255,0.4); box-shadow: inset 0 2px 2px rgba(0,0,0,0.1); }
@@ -149,6 +149,35 @@
         table { width: 100%; text-align: left; border-collapse: collapse; margin-top: 10px; }
         th, td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; color: #cbd5e1; }
         th { color: #fff; text-transform: uppercase; font-weight: 900; border-bottom: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); }
+
+        /* --- ESTILOS RANKING (CARRETERA DESGASTADA & ESCALA AZULES) --- */
+        .worn-asphalt-bg {
+            background-color: #1e293b;
+            background-image: 
+                linear-gradient(90deg, rgba(0,0,0,0) 15%, rgba(0,0,0,0.15) 22%, rgba(0,0,0,0.15) 28%, rgba(0,0,0,0) 35%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.15) 72%, rgba(0,0,0,0.15) 78%, rgba(0,0,0,0) 85%),
+                url('data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAwIDIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZmlsdGVyIGlkPSJub2lzZUZpbHRlciI+PGZlVHVyYnVsZW5jZSB0eXBlPSJmcmFjdGFsTm9pc2UiIGJhc2VGcmVxdWVuY3k9IjAuOCIgbnVtT2N0YXZlcz0iMyIgc3RpdGNoVGlsZXM9InN0aXRjaCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNub2lzZUZpbHRlcikiIG9wYWNpdHk9IjAuMTUiLz48L3N2Zz4=');
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
+            position: relative;
+        }
+        .worn-asphalt-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.15) 0, rgba(255,255,255,0.15) 40px, transparent 40px, transparent 80px);
+            z-index: 0;
+        }
+        .minimal-start-line {
+            width: 70%;
+            margin: 0 auto;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.6), transparent);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            position: relative;
+            z-index: 1;
+            border-radius: 50%;
+        }
 
         /* --- ESTILOS TV DASHBOARD --- */
         .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
@@ -326,7 +355,13 @@
         <!-- ZONA CONFIG PANEL (AHORA ARRIBA DE TODO Y COMPRIMIDA) -->
         <div class="w-full flex flex-col shrink-0 pointer-events-auto z-50 relative">
             <div id="config-panel" class="bg-black/80 backdrop-blur-xl border-white/20 rounded-xl shadow-xl w-full pointer-events-auto text-white border">
-                <h2 class="text-xs font-bold text-yellow-500 mb-2 border-b-2 border-white/10 pb-1 uppercase tracking-widest"><span data-lang-key="config_title">Configuración</span></h2>
+                <div class="flex justify-between items-center border-b-2 border-white/10 mb-2 pb-1">
+                    <h2 class="text-xs font-bold text-yellow-500 uppercase tracking-widest"><span data-lang-key="config_title">Configuración</span></h2>
+                    <button id="close-config-btn" class="flex items-center gap-1 text-[10px] font-bold text-gray-300 hover:text-white bg-white/10 hover:bg-white/20 px-2 py-1 rounded border border-white/20 uppercase transition-all shadow-sm">
+                        <span data-lang-key="close_config">Ocultar</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
                 
                 <!-- LISTAS DE HISTORIAL DE AUTOGUARDADO -->
                 <datalist id="drivers-list"></datalist>
@@ -979,7 +1014,7 @@
 
             <!-- Pie de Exportación (Oculto o compacto al final) -->
             <div class="flex flex-col md:flex-row justify-between items-center mt-2 pt-2 border-t border-red-900/50 shrink-0 gap-3 md:gap-2">
-                <!-- NUEVO: SISTEMA CLOUD SYNC AUTOMÁTICO -->
+            <!-- NUEVO: SISTEMA CLOUD SYNC AUTOMÁTICO -->
                 <div class="flex items-center space-x-2 bg-blue-950/40 border border-blue-500/50 px-3 py-1.5 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] w-full md:w-auto justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse shrink-0"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
                     <span class="text-blue-300 text-[10px] sm:text-xs uppercase font-bold tracking-widest shrink-0">ID Nube:</span>
@@ -1004,33 +1039,32 @@
         </div>
     </div>
     
-    <!-- MODAL RANKING -->
+    <div id="historyModal" class="modal-overlay hidden"><div class="modal-content p-6 w-full max-w-2xl"><h3 class="text-xl font-bold mb-4 text-blue-400 border-b border-white/20 pb-2">Historial Cara a Cara</h3><div class="overflow-y-auto max-h-60"><table class="w-full"><thead><tr><th>Fecha</th><th>Ganador</th><th>Tiempo</th><th>P1 Best</th><th>P2 Best</th></tr></thead><tbody id="full-history-body"></tbody></table></div><button id="close-history-btn" class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-lg">Cerrar Historial</button></div></div>
+    
+    <!-- MODAL DE RANKING GLOBAL (CARRETERA DESGASTADA & AZULES) -->
     <div id="rankingModal" class="modal-overlay hidden" style="z-index: 250;">
-        <div class="modal-content p-6 w-full max-w-2xl bg-gradient-to-br from-slate-900 to-black text-white border border-purple-500/50 shadow-[0_0_30px_rgba(168,85,247,0.3)]">
-            <h3 class="text-2xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 border-b border-white/20 pb-2 uppercase tracking-widest flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-yellow-400"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-                Hall of Fame (Garaje)
-            </h3>
-            <div class="overflow-y-auto max-h-[60vh] no-scrollbar">
-                <table class="w-full text-left border-collapse">
-                    <thead class="sticky top-0 bg-slate-900/95 backdrop-blur z-10 shadow-md">
-                        <tr>
-                            <th class="py-2 px-2 text-purple-400 font-bold text-xs uppercase tracking-wider border-b border-purple-500/30 w-12 text-center">Pos</th>
-                            <th class="py-2 px-2 text-purple-400 font-bold text-xs uppercase tracking-wider border-b border-purple-500/30">Coche</th>
-                            <th class="py-2 px-2 text-purple-400 font-bold text-xs uppercase tracking-wider border-b border-purple-500/30 hidden sm:table-cell">Categoría</th>
-                            <th class="py-2 px-2 text-purple-400 font-bold text-xs uppercase tracking-wider border-b border-purple-500/30 text-right">Mejor Tiempo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ranking-body" class="divide-y divide-white/5 font-mono text-sm">
-                        <!-- Rows injected via JS -->
-                    </tbody>
-                </table>
+        <div class="modal-content w-full max-w-4xl bg-slate-900 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden p-0 relative">
+            <div class="flex justify-between items-center bg-slate-950 p-4 sm:p-5 border-b border-slate-800 relative z-20">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 mr-3 opacity-80"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                    <h3 class="text-xl sm:text-2xl font-black font-rajdhani text-slate-100 tracking-[0.2em] opacity-90">RANKING GARAJE</h3>
+                </div>
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button id="clear-ranking-btn" class="text-red-500 hover:text-white font-bold text-[10px] uppercase tracking-widest px-3 py-1.5 border border-red-900/50 bg-red-900/20 rounded-lg hover:bg-red-600 transition-colors flex items-center shadow-md" title="Borrar todos los tiempos del garaje">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:mr-1.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <span class="hidden sm:inline">Borrar Tiempos</span>
+                    </button>
+                    <button id="close-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
+                </div>
             </div>
-            <button id="close-ranking-btn" class="mt-6 w-full bg-purple-900/50 hover:bg-purple-600 border border-purple-500 text-white font-bold p-3 rounded-lg uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)]">Cerrar Ranking</button>
+            <div class="w-full h-[65vh] sm:h-[75vh] worn-asphalt-bg overflow-y-auto tv-scrollbar p-4 sm:p-8 relative scroll-smooth">
+                <div class="minimal-start-line mt-2"></div>
+                <div id="ranking-body" class="flex flex-col gap-5 sm:gap-6 relative z-10 mt-8 pb-16">
+                    <!-- Cards inyectadas por JS -->
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div id="historyModal" class="modal-overlay hidden"><div class="modal-content p-6 w-full max-w-2xl"><h3 class="text-xl font-bold mb-4 text-blue-400 border-b border-white/20 pb-2">Historial Cara a Cara</h3><div class="overflow-y-auto max-h-60"><table class="w-full"><thead><tr><th>Fecha</th><th>Ganador</th><th>Tiempo</th><th>P1 Best</th><th>P2 Best</th></tr></thead><tbody id="full-history-body"></tbody></table></div><button id="close-history-btn" class="mt-6 w-full bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-lg">Cerrar Historial</button></div></div>
     
     <div id="resultsModal" class="modal-overlay hidden z-[100]">
         <div class="modal-content p-4 sm:p-8 text-center max-w-3xl w-full mx-4 flex flex-col max-h-[95vh]">
@@ -1129,7 +1163,7 @@
         const translations = {
             es: { 
                 start_race: "INICIAR", config: "CONFIG", reset_race: "REINICIAR", pause: "PAUSA", resume: "REANUDAR", video_status_init: "Inicia la cámara para 30FPS IA", video_status_ready: "CÁMARA IA LISTA", video_status_off: "Cámara Apagada", completed: "Completado", winner: "Ganador:", voice_completed: "Carrera terminada", voice_winner: "Victoria para ", voice_record: "Vuelta rápida de ", voice_calibrated: "Sensores calibrados", voice_ready: "Listos", voice_false_start: "Salida Nula de",
-                history_btn: "Historial", direct_tv_btn: "Telemetría TV", config_title: "Configuración", language_label: "Idioma", game_mode_label: "Modo", mode_2p: "🏁 2 JUGADORES (Duelo)", mode_1p: "⏱️ 1 JUGADOR (Contrarreloj)", player_1: "JUGADOR 1 (ORO)", player_2: "JUGADOR 2 (COBRE)", name_label: "Nombre", car_label: "Coche", sound_p1: "Sonido", sound_p2: "Sonido", track_length_label: "Pista (m)", race_condition_label: "Carrera", voice_comments: "Voz:", safety_time_label: "Anti-Rebotes:", global_time: "GLOBAL", calibrating_title: "Calibrando Sensores...", flag_yellow: "PAUSA", false_start: "¡SALIDA NULA!", race_mode_laps: "Vueltas", race_mode_time: "Tiempo",
+                history_btn: "Historial", direct_tv_btn: "Telemetría TV", config_title: "Configuración", close_config: "Ocultar", language_label: "Idioma", game_mode_label: "Modo", mode_2p: "🏁 2 JUGADORES (Duelo)", mode_1p: "⏱️ 1 JUGADOR (Contrarreloj)", player_1: "JUGADOR 1 (ORO)", player_2: "JUGADOR 2 (COBRE)", name_label: "Nombre", car_label: "Coche", sound_p1: "Sonido", sound_p2: "Sonido", track_length_label: "Pista (m)", race_condition_label: "Carrera", voice_comments: "Voz:", safety_time_label: "Anti-Rebotes:", global_time: "GLOBAL", calibrating_title: "Calibrando Sensores...", flag_yellow: "PAUSA", false_start: "¡SALIDA NULA!", race_mode_laps: "Vueltas", race_mode_time: "Tiempo",
                 tv_stats_gold: "Estadísticas Oro", tv_stats_copper: "Estadísticas Cobre", tv_laps: "VUELTAS", tv_consistency: "CONSISTENCIA", tv_best: "MEJOR", tv_last: "ÚLTIMA", tv_avg_spd: "VEL. MED", tv_max_spd: "VEL. MÁX", tv_evol_time: "Evolución Tiempos & Delta (S)", tv_history: "Historial Cara a Cara", tv_speed_curve: "Curva Velocidad (Km/h)", tv_evol_cons: "Evolución Consistencia (%)", tv_bar_comp: "Comparativa Barras", tv_diff: "DIF",
                 tv_mode_duel: "MODO DUELO", tv_mode_time: "CONTRARRELOJ", tv_status_pause: "BANDERA AMARILLA (PAUSA)", tv_status_false_start: "SALIDA NULA", tv_status_ready: "PREPARADOS...", tv_status_racing: "CARRERA EN CURSO", tv_status_finished: "CARRERA FINALIZADA", tv_status_waiting: "ESPERANDO...", tv_status_link: "ENLACE ACTIVO. ESPERANDO COCHES...", tv_status_uplink: "ESTABLECIENDO UPLINK...", tv_status_searching: "BUSCANDO SEÑAL DE TELEMETRÍA", tv_status_inactive: "SALA INACTIVA O CERRADA", tv_status_error: "ERROR DE CONEXIÓN",
                 lap_breakdown: "Desglose de Vueltas por Piloto", csv_header: "Piloto,Vuelta,Tiempo(ms),Tiempo Formateado,Velocidad Media(km/h)\n", default_p1: "Piloto 1", default_p2: "Piloto 2", race_telemetry: "Telemetría en Vivo",
@@ -1138,7 +1172,7 @@
             },
             en: { 
                 start_race: "START", config: "CONFIG", reset_race: "RESET", pause: "PAUSE", resume: "RESUME", video_status_init: "Start camera for 30FPS AI", video_status_ready: "AI CAMERA READY", video_status_off: "Camera Off", completed: "Completed", winner: "Winner:", voice_completed: "Race finished", voice_winner: "Winner ", voice_record: "Fastest lap for ", voice_calibrated: "Sensors calibrated", voice_ready: "Ready", voice_false_start: "False start for",
-                history_btn: "History", direct_tv_btn: "TV Telemetry", config_title: "Configuration", language_label: "Language", game_mode_label: "Mode", mode_2p: "🏁 2 PLAYERS (Duel)", mode_1p: "⏱️ 1 PLAYER (Time Trial)", player_1: "PLAYER 1 (GOLD)", player_2: "PLAYER 2 (COPPER)", name_label: "Name", car_label: "Car", sound_p1: "Sound", sound_p2: "Sound", track_length_label: "Track (m)", race_condition_label: "Race", voice_comments: "Voice:", safety_time_label: "Anti-Bounce:", global_time: "GLOBAL", calibrating_title: "Calibrating Sensors...", flag_yellow: "PAUSE", false_start: "FALSE START!", race_mode_laps: "Laps", race_mode_time: "Time",
+                history_btn: "History", direct_tv_btn: "TV Telemetry", config_title: "Configuration", close_config: "Hide", language_label: "Language", game_mode_label: "Mode", mode_2p: "🏁 2 PLAYERS (Duel)", mode_1p: "⏱️ 1 PLAYER (Time Trial)", player_1: "PLAYER 1 (GOLD)", player_2: "PLAYER 2 (COPPER)", name_label: "Name", car_label: "Car", sound_p1: "Sound", sound_p2: "Sound", track_length_label: "Track (m)", race_condition_label: "Race", voice_comments: "Voice:", safety_time_label: "Anti-Bounce:", global_time: "GLOBAL", calibrating_title: "Calibrating Sensors...", flag_yellow: "PAUSE", false_start: "FALSE START!", race_mode_laps: "Laps", race_mode_time: "Time",
                 tv_stats_gold: "Gold Stats", tv_stats_copper: "Copper Stats", tv_laps: "LAPS", tv_consistency: "CONSISTENCY", tv_best: "BEST", tv_last: "LAST", tv_avg_spd: "AVG SPD", tv_max_spd: "MAX SPD", tv_evol_time: "Time Evolution & Delta (S)", tv_history: "Head-to-Head History", tv_speed_curve: "Speed Curve (Km/h)", tv_evol_cons: "Consistency Evolution (%)", tv_bar_comp: "Bar Comparison", tv_diff: "DIFF",
                 tv_mode_duel: "DUEL MODE", tv_mode_time: "TIME TRIAL", tv_status_pause: "YELLOW FLAG (PAUSED)", tv_status_false_start: "FALSE START", tv_status_ready: "GET READY...", tv_status_racing: "RACE IN PROGRESS", tv_status_finished: "RACE FINISHED", tv_status_waiting: "WAITING...", tv_status_link: "LINK ACTIVE. WAITING FOR CARS...", tv_status_uplink: "ESTABLISHING UPLINK...", tv_status_searching: "SEARCHING TELEMETRY SIGNAL", tv_status_inactive: "INACTIVE OR CLOSED ROOM", tv_status_error: "CONNECTION ERROR",
                 lap_breakdown: "Lap Breakdown by Driver", csv_header: "Driver,Lap,Time(ms),Formatted Time,Avg Speed(km/h)\n", default_p1: "Driver 1", default_p2: "Driver 2", race_telemetry: "Live Telemetry",
@@ -1147,7 +1181,7 @@
             },
             fr: {
                 start_race: "DÉMARRER", config: "CONFIG", reset_race: "RÉINITIALISER", pause: "PAUSE", resume: "REPRENDRE", video_status_init: "Démarrer caméra pour 30FPS IA", video_status_ready: "CAMÉRA IA PRÊTE", video_status_off: "Caméra Désactivée", completed: "Terminé", winner: "Gagnant:", voice_completed: "Course terminée", voice_winner: "Victoire pour ", voice_record: "Meilleur tour pour ", voice_calibrated: "Capteurs calibrés", voice_ready: "Prêts", voice_false_start: "Faux départ de",
-                history_btn: "Historique", direct_tv_btn: "Télémétrie TV", config_title: "Configuration", language_label: "Langue", game_mode_label: "Mode", mode_2p: "🏁 2 JOUEURS (Duel)", mode_1p: "⏱️ 1 JOUEUR (Contre-la-montre)", player_1: "JOUEUR 1 (OR)", player_2: "JOUEUR 2 (CUIVRE)", name_label: "Nom", car_label: "Voiture", sound_p1: "Son", sound_p2: "Son", track_length_label: "Piste (m)", race_condition_label: "Course", voice_comments: "Voix:", safety_time_label: "Anti-Rebond:", global_time: "GLOBAL", calibrating_title: "Calibrage Capteurs...", flag_yellow: "PAUSE", false_start: "FAUX DÉPART!", race_mode_laps: "Tours", race_mode_time: "Temps",
+                history_btn: "Historique", direct_tv_btn: "Télémétrie TV", config_title: "Configuration", close_config: "Masquer", language_label: "Langue", game_mode_label: "Mode", mode_2p: "🏁 2 JOUEURS (Duel)", mode_1p: "⏱️ 1 JOUEUR (Contre-la-montre)", player_1: "JOUEUR 1 (OR)", player_2: "JOUEUR 2 (CUIVRE)", name_label: "Nom", car_label: "Voiture", sound_p1: "Son", sound_p2: "Son", track_length_label: "Piste (m)", race_condition_label: "Course", voice_comments: "Voix:", safety_time_label: "Anti-Rebond:", global_time: "GLOBAL", calibrating_title: "Calibrage Capteurs...", flag_yellow: "PAUSE", false_start: "FAUX DÉPART!", race_mode_laps: "Tours", race_mode_time: "Temps",
                 tv_stats_gold: "Stats Or", tv_stats_copper: "Stats Cuivre", tv_laps: "TOURS", tv_consistency: "CONSISTANCE", tv_best: "MEILLEUR", tv_last: "DERNIER", tv_avg_spd: "VIT MOY", tv_max_spd: "VIT MAX", tv_evol_time: "Évolution Temps & Delta (S)", tv_history: "Historique Face à Face", tv_speed_curve: "Courbe de Vitesse (Km/h)", tv_evol_cons: "Évolution Consistance (%)", tv_bar_comp: "Comparaison Barres", tv_diff: "DIFF",
                 tv_mode_duel: "MODE DUEL", tv_mode_time: "CONTRE-LA-MONTRE", tv_status_pause: "DRAPEAU JAUNE (PAUSE)", tv_status_false_start: "FAUX DÉPART", tv_status_ready: "PRÊTS...", tv_status_racing: "COURSE EN COURS", tv_status_finished: "COURSE TERMINÉE", tv_status_waiting: "EN ATTENTE...", tv_status_link: "LIEN ACTIF. EN ATTENTE DE VOITURES...", tv_status_uplink: "ÉTABLISSEMENT LIAISON...", tv_status_searching: "RECHERCHE SIGNAL TÉLÉMÉTRIE", tv_status_inactive: "SALLE INACTIVE OU FERMÉE", tv_status_error: "ERREUR DE CONNEXION",
                 lap_breakdown: "Détail des Tours par Pilote", csv_header: "Pilote,Tour,Temps(ms),Temps Formaté,Vitesse Moyenne(km/h)\n", default_p1: "Pilote 1", default_p2: "Pilote 2", race_telemetry: "Télémétrie en Direct",
@@ -2678,6 +2712,10 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             }
         };
         
+        document.getElementById('close-config-btn').onclick = () => {
+            document.getElementById('central-config-btn').click();
+        };
+        
         document.getElementById('pause-race-btn').onclick = togglePause;
         document.getElementById('camera-on-btn').onclick = startWebcam; 
         document.getElementById('camera-off-btn').onclick = stopWebcam;
@@ -2788,10 +2826,11 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         const rankingModal = document.getElementById('rankingModal');
         const openRankingBtn = document.getElementById('open-ranking-btn');
         const closeRankingBtn = document.getElementById('close-ranking-btn');
+        const clearRankingBtn = document.getElementById('clear-ranking-btn');
 
         function openRanking() {
-            const tbody = document.getElementById('ranking-body');
-            tbody.innerHTML = '';
+            const rankingBody = document.getElementById('ranking-body');
+            rankingBody.innerHTML = '';
             
             let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
             
@@ -2808,36 +2847,113 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             validCars.sort((a, b) => a._numTime - b._numTime);
 
             if (validCars.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-gray-500 italic font-sans">No hay tiempos registrados en el garaje aún. ¡Sal a la pista!</td></tr>`;
+                rankingBody.innerHTML = `<div class="text-center p-4 text-slate-400 font-rajdhani tracking-widest bg-slate-900/80 rounded-lg backdrop-blur-sm mt-10">No hay tiempos registrados en el garaje aún. ¡Sal a la pista!</div>`;
             } else {
-                validCars.forEach((c, i) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-purple-900/20 transition-colors";
+                const leaderLap = validCars[0]._numTime;
+
+                validCars.forEach((c, idx) => {
+                    const isLeft = idx % 2 === 0; 
                     
-                    let posColor = "text-gray-400";
-                    let posBg = "";
-                    let medal = "";
-                    if (i === 0) { posColor = "text-yellow-900 font-black"; posBg = "bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]"; medal = "🏆"; }
-                    else if (i === 1) { posColor = "text-slate-900 font-black"; posBg = "bg-slate-300 rounded-full shadow-[0_0_10px_#cbd5e1]"; medal = "🥈"; }
-                    else if (i === 2) { posColor = "text-amber-900 font-black"; posBg = "bg-amber-600 rounded-full shadow-[0_0_10px_#d97706]"; medal = "🥉"; }
+                    const deltaMs = (c._numTime - leaderLap) * 1000;
+                    const deltaStr = idx === 0 ? "LÍDER" : `+${(deltaMs / 1000).toFixed(3)}s`;
 
-                    let posContent = `<div class="w-6 h-6 mx-auto flex items-center justify-center ${posBg} ${posColor}">${i + 1}</div>`;
+                    let borderGlow = 'border-slate-700 shadow-[0_5px_15px_rgba(0,0,0,0.3)] bg-slate-800/80';
+                    let posColor = 'text-slate-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]';
+                    let accentBorder = 'border-l-slate-600';
+                    let textColor = 'text-slate-200';
+                    let subTextColor = 'text-slate-400';
+                    let highlightColor = 'text-slate-300';
+                    
+                    if (idx === 0) {
+                        borderGlow = 'border-cyan-400/60 shadow-[0_0_20px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/30 to-slate-900/90';
+                        posColor = 'text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]';
+                        accentBorder = 'border-l-cyan-400';
+                        textColor = 'text-white';
+                        subTextColor = 'text-cyan-200/80';
+                        highlightColor = 'text-cyan-100';
+                    } else if (idx === 1) {
+                        borderGlow = 'border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-gradient-to-br from-blue-900/30 to-slate-900/90';
+                        posColor = 'text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]';
+                        accentBorder = 'border-l-blue-500';
+                        textColor = 'text-blue-50';
+                        subTextColor = 'text-blue-300/80';
+                        highlightColor = 'text-blue-200';
+                    } else if (idx === 2) {
+                        borderGlow = 'border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)] bg-gradient-to-br from-indigo-900/30 to-slate-900/90';
+                        posColor = 'text-indigo-400 drop-shadow-[0_0_10px_rgba(99,102,241,0.8)]';
+                        accentBorder = 'border-l-indigo-500';
+                        textColor = 'text-indigo-50';
+                        subTextColor = 'text-indigo-300/80';
+                        highlightColor = 'text-indigo-200';
+                    }
 
-                    tr.innerHTML = `
-                        <td class="py-3 px-2 text-center align-middle">${posContent}</td>
-                        <td class="py-3 px-2 align-middle">
-                            <div class="font-bold text-white flex items-center gap-2">${c.name || 'Desconocido'} <span>${medal}</span></div>
-                            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-sans">${c.marca || ''} ${c.ref || ''}</div>
-                        </td>
-                        <td class="py-3 px-2 align-middle hidden sm:table-cell text-gray-300 text-xs font-sans uppercase">${c.cat || '-'}</td>
-                        <td class="py-3 px-2 text-right align-middle font-black text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.5)] text-base">${c.bestLap}</td>
+                    let div = document.createElement('div');
+                    div.className = `w-[90%] md:w-[45%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-4 sm:p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-blue-400/50 group`;
+                    
+                    div.innerHTML = `
+                        <div class="absolute -top-3 sm:-top-4 ${isLeft ? '-left-2 sm:-left-4' : '-right-2 sm:-right-4'} font-rajdhani font-black text-3xl sm:text-4xl italic ${posColor} z-20 transition-transform duration-300 group-hover:scale-110">
+                            P${idx + 1}
+                        </div>
+                        
+                        <div class="flex flex-col gap-1 mt-1 pl-1">
+                            <span class="${textColor} font-bold font-rajdhani text-lg sm:text-xl truncate tracking-wide group-hover:text-white transition-colors drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]">
+                                ${c.name || 'Desconocido'}
+                            </span>
+                            <span class="${subTextColor} font-medium font-rajdhani text-xs sm:text-sm uppercase tracking-widest truncate">
+                                ${c.marca || ''} ${c.ref || ''} | ${c.cat || '-'}
+                            </span>
+                            
+                            <div class="flex justify-between items-end mt-3 pt-3 border-t border-slate-700/60">
+                                <div class="flex flex-col">
+                                    <span class="text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-1">
+                                        Dif: <span class="${highlightColor}">${deltaStr}</span>
+                                    </span>
+                                    <div class="flex gap-3 text-slate-400 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase">
+                                        <span title="Velocidad Media" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                            ${c.avgSpd || '0.0 km/h'}
+                                        </span>
+                                        <span title="Constancia" class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                            ${(parseFloat(c.consistency) || 0).toFixed(1)}%
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <span class="${highlightColor} font-black font-rajdhani text-2xl sm:text-3xl leading-none tracking-tighter drop-shadow-[0_0_5px_rgba(255,255,255,0.2)] group-hover:text-white transition-colors text-right">
+                                    ${c.bestLap}
+                                </span>
+                            </div>
+                        </div>
                     `;
-                    tbody.appendChild(tr);
+                    rankingBody.appendChild(div);
                 });
             }
 
             rankingModal.classList.remove('hidden');
             setTimeout(() => rankingModal.classList.add('open'), 10);
+        }
+
+        if (clearRankingBtn) {
+            clearRankingBtn.addEventListener('click', () => {
+                if (confirm("🏁 ¡ATENCIÓN! 🏁\n\n¿Estás seguro de que quieres BORRAR TODOS LOS TIEMPOS Y RÉCORDS del garaje?\n\n(No te preocupes, esto NO borrará tus coches, únicamente reseteará sus cronos, kilómetros y estadísticas a cero para empezar de nuevo).")) {
+                    let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
+                    cars.forEach(car => {
+                        car.bestLap = "-";
+                        car.totalTime = "0h 0m 0s";
+                        car.totalDist = "0.000 km";
+                        car.avgSpd = "0.0 km/h";
+                        car.avgSpd32 = "0.0 km/h";
+                        car.consistency = "0";
+                        car._rawTotalTime = 0;
+                        car._rawTotalDist = 0;
+                    });
+                    localStorage.setItem('kronodual_garage_cars', JSON.stringify(cars));
+                    garageCars = cars; 
+                    if (typeof saveGarageToCloud === 'function') saveGarageToCloud(); 
+                    openRanking(); // Refrescar vista
+                }
+            });
         }
 
         if (openRankingBtn) openRankingBtn.addEventListener('click', openRanking);
