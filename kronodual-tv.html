@@ -208,7 +208,7 @@
             overflow: hidden; 
             align-content: stretch;
         }
-        .tv-widget { transition: box-shadow 0.2s ease, border-color 0.2s ease; container-type: size; width: 100%; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; }
+        .tv-widget { transition: box-shadow 0.2s ease, border-color 0.2s ease; container-type: inline-size; width: 100%; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; }
         .tv-widget:hover { border-color: rgba(250, 204, 21, 0.4); box-shadow: 0 0 20px rgba(250, 204, 21, 0.1); }
 
         /* TAMAÑOS POR DEFECTO (Spans de Cuadrícula) */
@@ -230,18 +230,18 @@
         .tv-grid-layout.single-player #w-p1-main,
         .tv-grid-layout.single-player #w-p1-stats { grid-column-end: span 6; }
         
-        /* Typography TV - Escalado Automático Perfecto basado en Ancho y Alto (Container Queries Mixtas) */
-        .cq-text-xxs { font-size: clamp(0.2rem, min(2cqw, 5cqh), 0.8rem); line-height: 1.1; }
-        .cq-text-xs  { font-size: clamp(0.3rem, min(3cqw, 8cqh), 1rem); line-height: 1.1; }
-        .cq-text-sm  { font-size: clamp(0.4rem, min(4cqw, 10cqh), 1.25rem); line-height: 1.1; }
-        .cq-text-md  { font-size: clamp(0.5rem, min(5cqw, 12cqh), 1.5rem); line-height: 1.1; }
-        .cq-text-lg  { font-size: clamp(0.6rem, min(6cqw, 15cqh), 2rem); line-height: 1.1; }
-        .cq-text-xl  { font-size: clamp(0.7rem, min(8cqw, 18cqh), 2.5rem); line-height: 1.1; }
-        .cq-text-2xl { font-size: clamp(0.8rem, min(10cqw, 20cqh), 3rem); line-height: 1; }
-        .cq-text-3xl { font-size: clamp(0.9rem, min(12cqw, 25cqh), 4rem); line-height: 1; }
-        .cq-text-4xl { font-size: clamp(1rem, min(15cqw, 30cqh), 5rem); line-height: 1; }
-        .cq-text-5xl { font-size: clamp(1.2rem, min(20cqw, 35cqh), 6.5rem); line-height: 0.9; }
-        .cq-text-giant { font-size: clamp(1.5rem, min(22cqw, 40cqh), 12rem); line-height: 0.8; letter-spacing: -0.02em; }
+        /* Typography TV - Escalado Automático basado en Contenedores (Container Queries) Mejorado y Protegido */
+        .cq-text-xxs { font-size: clamp(0.4rem, 2.5cqi, 0.8rem); line-height: 1.1; }
+        .cq-text-xs { font-size: clamp(0.5rem, 3cqi, 1rem); line-height: 1.1; }
+        .cq-text-sm { font-size: clamp(0.6rem, 4cqi, 1.25rem); line-height: 1.1; }
+        .cq-text-md { font-size: clamp(0.75rem, 5cqi, 1.5rem); line-height: 1.1; }
+        .cq-text-lg { font-size: clamp(0.9rem, 6cqi, 2rem); line-height: 1.1; }
+        .cq-text-xl { font-size: clamp(1rem, 7cqi, 2.5rem); line-height: 1.1; }
+        .cq-text-2xl { font-size: clamp(1.25rem, 8cqi, 3rem); line-height: 1; }
+        .cq-text-3xl { font-size: clamp(1.5rem, 10cqi, 4rem); line-height: 1; }
+        .cq-text-4xl { font-size: clamp(1.75rem, 12cqi, 5rem); line-height: 1; }
+        .cq-text-5xl { font-size: clamp(2rem, 14cqi, 6rem); line-height: 0.9; }
+        .cq-text-giant { font-size: clamp(2.5rem, 18cqi, 7.5rem); line-height: 0.9; letter-spacing: -0.02em; }
 
         /* ESTILOS ICONO MOVER (DRAG) - SIEMPRE VISIBLE */
         .drag-handle { 
@@ -707,17 +707,17 @@
             <div id="w-p1-main" class="tv-widget tv-panel flex flex-col items-center justify-center border-t-4 border-yellow-400 bg-yellow-900/10 group p-2">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span id="tv-p1-name" class="cq-text-4xl font-rajdhani font-black text-yellow-400 tracking-widest uppercase mb-2 pointer-events-none drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] truncate w-full text-center px-4">P1</span>
-                <span id="tv-p1-current" class="tv-font cq-text-giant font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
-                <div class="mt-2 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p1-gap" class="tv-font cq-text-2xl font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
+                <span id="tv-p1-name" class="cq-text-3xl font-rajdhani font-black text-yellow-400 tracking-widest uppercase mb-1 pointer-events-none drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] truncate w-full text-center px-4">P1</span>
+                <span id="tv-p1-current" class="tv-font cq-text-5xl font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
+                <div class="mt-1 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p1-gap" class="tv-font cq-text-xl font-bold px-3 py-1 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
             </div>
 
             <div id="w-p2-main" class="tv-widget tv-panel flex flex-col items-center justify-center border-t-4 border-orange-500 bg-orange-900/10 group p-2">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-orange-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span id="tv-p2-name" class="cq-text-4xl font-rajdhani font-black text-orange-400 tracking-widest uppercase mb-2 pointer-events-none drop-shadow-[0_0_10px_rgba(249,115,22,0.6)] truncate w-full text-center px-4">P2</span>
-                <span id="tv-p2-current" class="tv-font cq-text-giant font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
-                <div class="mt-2 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p2-gap" class="tv-font cq-text-2xl font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
+                <span id="tv-p2-name" class="cq-text-3xl font-rajdhani font-black text-orange-400 tracking-widest uppercase mb-1 pointer-events-none drop-shadow-[0_0_10px_rgba(249,115,22,0.6)] truncate w-full text-center px-4">P2</span>
+                <span id="tv-p2-current" class="tv-font cq-text-5xl font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
+                <div class="mt-1 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p2-gap" class="tv-font cq-text-xl font-bold px-3 py-1 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
             </div>
 
             <div id="w-p1-stats" class="tv-widget tv-panel flex flex-col justify-center p-4 border-l-4 border-yellow-400/50 group">
