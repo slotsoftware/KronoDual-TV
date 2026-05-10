@@ -3065,10 +3065,19 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                         window.fs.onSnapshot(cmdDocRef, (docSnap) => {
                             if (docSnap.exists()) {
                                 const cmd = docSnap.data();
-                                if (cmd.ts > lastProcessedCmdTs) {
-                                    lastProcessedCmdTs = cmd.ts;
+                                // Si es la primera vez que lee, guardamos el último comando para no ejecutar acciones viejas al cargar
+                                if (isFirstCommandSnapshot) {
+                                    isFirstCommandSnapshot = false;
+                                    lastProcessedCmdId = cmd.cmdId;
+                                    return;
+                                }
+                                // Ejecuta solo si el ID de comando es diferente al último procesado
+                                if (cmd.cmdId && cmd.cmdId !== lastProcessedCmdId) {
+                                    lastProcessedCmdId = cmd.cmdId;
                                     handleRemoteCommand(cmd.action);
                                 }
+                            } else {
+                                isFirstCommandSnapshot = false; // Aún no hay comandos creados
                             }
                         });
                     }
@@ -3076,8 +3085,9 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             }
         };
 
-        // Evita ejecutar comandos antiguos que se quedaron guardados en la base de datos al cargar la app
-        let lastProcessedCmdTs = Date.now(); 
+        // Identificador único para evitar comandos en bucle o ignorados por desincronización de reloj
+        let lastProcessedCmdId = null;
+        let isFirstCommandSnapshot = true; 
         
         function handleRemoteCommand(action) {
             // Manejar comandos en formato objeto (como asignar coches desde la TV)
@@ -3124,9 +3134,8 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             kronoChannel.onmessage = (event) => { 
                 if (event.data.type === 'REQUEST_STATE') broadcastState(); 
                 else if (event.data.type === 'REMOTE_CMD') {
-                    const cmdTs = event.data.ts || Date.now();
-                    if (cmdTs > lastProcessedCmdTs) {
-                        lastProcessedCmdTs = cmdTs;
+                    if (event.data.cmdId && event.data.cmdId !== lastProcessedCmdId) {
+                        lastProcessedCmdId = event.data.cmdId;
                         handleRemoteCommand(event.data.command);
                     }
                 }
@@ -3139,15 +3148,18 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
         function sendRemoteCommand(action) {
             const now = Date.now();
+            const cmdId = now.toString(36) + Math.random().toString(36).substring(2, 6); // Generador de ID Único
+            
             if (!isTVMode && typeof handleRemoteCommand === 'function') {
-                lastProcessedCmdTs = now;
+                lastProcessedCmdId = cmdId;
                 handleRemoteCommand(action);
             }
-            kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, ts: now });
+            kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, cmdId: cmdId });
+            
             if (cloudRoomCode && window.db && window.fs) {
                 try {
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', globalAppId, 'public', 'data', 'tv_commands', cloudRoomCode);
-                    window.fs.setDoc(cmdDocRef, { action: action, ts: now });
+                    window.fs.setDoc(cmdDocRef, { action: action, cmdId: cmdId, ts: now });
                 } catch (e) {}
             }
         }
