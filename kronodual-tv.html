@@ -794,9 +794,6 @@
                 
                 <!-- Derecha: Botones Control -->
                 <div class="flex items-center space-x-2">
-                    <button id="garage-assign-p1-btn" class="bg-yellow-900/40 border border-yellow-500 hover:bg-yellow-500 text-yellow-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(250,204,21,0.3)] hover:shadow-[0_0_20px_rgba(250,204,21,0.8)]" title="Asignar al Piloto 1 (Oro)">Usar P1</button>
-                    <button id="garage-assign-p2-btn" class="bg-orange-900/40 border border-orange-500 hover:bg-orange-500 text-orange-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.8)]" title="Asignar al Piloto 2 (Cobre)">Usar P2</button>
-                    <div class="w-px h-6 bg-red-500/50 mx-1 shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
                     <button id="garage-add-btn" class="bg-red-900/40 border border-red-500 hover:bg-red-500 text-red-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_20px_rgba(239,68,68,0.8)]">Añadir</button>
                     <button id="garage-edit-btn" class="bg-blue-900/40 border border-blue-500 hover:bg-blue-500 text-blue-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]">Editar</button>
                     <button id="garage-save-btn" class="hidden bg-green-900/40 border border-green-500 hover:bg-green-500 text-green-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_15px_rgba(34,197,94,0.6)] hover:shadow-[0_0_25px_rgba(34,197,94,1)]">Guardar</button>
@@ -817,6 +814,16 @@
                 <!-- COLUMNA IZQUIERDA -->
                 <div class="col-span-5 flex flex-col gap-3 min-h-0">
                     
+                    <!-- CAJA DE ASIGNACIÓN RÁPIDA (MUY VISIBLE) -->
+                    <div id="assign-buttons-container" class="shrink-0 grid grid-cols-2 gap-2 z-20">
+                        <button id="garage-assign-p1-btn" class="bg-yellow-900/60 border-2 border-yellow-500 hover:bg-yellow-600 text-yellow-100 py-2.5 text-xs sm:text-sm font-black uppercase transition-all rounded-lg shadow-[0_0_15px_rgba(250,204,21,0.3)] hover:shadow-[0_0_25px_rgba(250,204,21,0.8)]">
+                            🏁 Usar P1 (Oro)
+                        </button>
+                        <button id="garage-assign-p2-btn" class="bg-orange-900/60 border-2 border-orange-500 hover:bg-orange-600 text-orange-100 py-2.5 text-xs sm:text-sm font-black uppercase transition-all rounded-lg shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.8)]">
+                            🏁 Usar P2 (Cobre)
+                        </button>
+                    </div>
+
                     <!-- Caja de Imagen (Cyberpunk Cyan) -->
                     <div class="flex-1 border-2 border-cyan-400 rounded-lg overflow-hidden bg-black relative flex items-center justify-center group shadow-[0_0_25px_rgba(34,211,238,0.3),inset_0_0_30px_rgba(34,211,238,0.15)] min-h-0">
                         <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/30 via-transparent to-transparent pointer-events-none"></div>
@@ -3073,6 +3080,19 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         let lastProcessedCmdTs = Date.now(); 
         
         function handleRemoteCommand(action) {
+            // Manejar comandos en formato objeto (como asignar coches desde la TV)
+            if (typeof action === 'object') {
+                if (action.type === 'SET_CAR') {
+                    const inputEl = document.getElementById(action.player === 1 ? 'p1-car' : 'p2-car');
+                    if (inputEl) {
+                        inputEl.value = action.carName;
+                        saveLocalConfig();
+                        if (typeof triggerCloudSync === 'function') triggerCloudSync();
+                    }
+                }
+                return;
+            }
+
             if (action === 'PAUSE') {
                 togglePause();
             } else if (action === 'NEW_RACE') {
@@ -3337,12 +3357,12 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
         function toggleGarageEdit(editing) {
             isGarageEditing = editing;
+            const assignContainer = document.getElementById('assign-buttons-container');
             if (editing) {
                 garageContainer.classList.add('g-editing');
                 if(editBtn) editBtn.classList.add('hidden');
                 if(saveBtn) saveBtn.classList.remove('hidden');
-                if(assignP1Btn) assignP1Btn.classList.add('hidden');
-                if(assignP2Btn) assignP2Btn.classList.add('hidden');
+                if(assignContainer) assignContainer.classList.add('hidden');
                 if(imgOverlay) imgOverlay.classList.remove('hidden');
                 if(nameEditContainer) nameEditContainer.classList.remove('hidden');
                 if(garageCarSelect) garageCarSelect.parentElement.classList.add('hidden');
@@ -3350,8 +3370,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 garageContainer.classList.remove('g-editing');
                 if(editBtn) editBtn.classList.remove('hidden');
                 if(saveBtn) saveBtn.classList.add('hidden');
-                if(assignP1Btn) assignP1Btn.classList.remove('hidden');
-                if(assignP2Btn) assignP2Btn.classList.remove('hidden');
+                if(assignContainer) assignContainer.classList.remove('hidden');
                 if(imgOverlay) imgOverlay.classList.add('hidden');
                 if(nameEditContainer) nameEditContainer.classList.add('hidden');
                 if(garageCarSelect) garageCarSelect.parentElement.classList.remove('hidden');
@@ -3682,22 +3701,42 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             if (garageCars.length === 0) return;
             const car = garageCars[currentGarageIndex];
             const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
-            const inputId = playerNum === 1 ? 'p1-car' : 'p2-car';
-            const inputEl = document.getElementById(inputId);
             
-            if (inputEl) {
-                inputEl.value = carName;
+            const carInputId = playerNum === 1 ? 'p1-car' : 'p2-car';
+            const carInputEl = document.getElementById(carInputId);
+            
+            if (carInputEl) {
+                // 1. Forzar la actualización local en el input de la config
+                carInputEl.value = carName;
                 saveLocalConfig();
-                if (!isTVMode) { broadcastState(); syncToCloud(); }
+                
+                // 2. Forzar la actualización directa en el DOM del Modo TV (Asegura el cambio visual al instante)
+                const tvCarTitle = document.getElementById(`tv-header-p${playerNum}-car`);
+                if (tvCarTitle) {
+                    tvCarTitle.textContent = carName;
+                }
+                
+                // 3. Flujo normal de estado
+                if (isTVMode) {
+                    if (tvData && tvData.players) {
+                        const p = tvData.players.find(x => x.id === playerNum);
+                        if (p) p.car = carName;
+                    }
+                    sendRemoteCommand({ type: 'SET_CAR', player: playerNum, carName: carName });
+                } else {
+                    broadcastState(); 
+                    syncToCloud();
+                }
                 
                 // Confirmación visual
                 const btn = document.getElementById(`garage-assign-p${playerNum}-btn`);
                 const originalText = btn.innerHTML;
-                btn.innerHTML = "¡OK!";
-                btn.classList.add('!bg-green-600', '!border-green-400', '!text-white', '!shadow-[0_0_20px_rgba(34,197,94,0.8)]');
+                btn.innerHTML = "¡ASIGNADO!";
+                btn.classList.add('!bg-green-600', '!border-green-400', '!text-white', '!shadow-[0_0_25px_rgba(34,197,94,1)]', 'scale-105');
+                
                 setTimeout(() => {
                     btn.innerHTML = originalText;
-                    btn.classList.remove('!bg-green-600', '!border-green-400', '!text-white', '!shadow-[0_0_20px_rgba(34,197,94,0.8)]');
+                    btn.classList.remove('!bg-green-600', '!border-green-400', '!text-white', '!shadow-[0_0_25px_rgba(34,197,94,1)]', 'scale-105');
                 }, 1500);
             }
         }
