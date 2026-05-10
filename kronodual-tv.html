@@ -230,18 +230,18 @@
         .tv-grid-layout.single-player #w-p1-main,
         .tv-grid-layout.single-player #w-p1-stats { grid-column-end: span 6; }
         
-        /* Typography TV - Escalado Automático basado en Contenedores (Container Queries) Mejorado y Protegido */
-        .cq-text-xxs { font-size: clamp(0.4rem, 2.5cqmin, 0.8rem); line-height: 1.1; }
-        .cq-text-xs { font-size: clamp(0.5rem, 3cqmin, 1rem); line-height: 1.1; }
-        .cq-text-sm { font-size: clamp(0.6rem, 4cqmin, 1.25rem); line-height: 1.1; }
-        .cq-text-md { font-size: clamp(0.75rem, 5cqmin, 1.5rem); line-height: 1.1; }
-        .cq-text-lg { font-size: clamp(0.9rem, 6cqmin, 2rem); line-height: 1.1; }
-        .cq-text-xl { font-size: clamp(1rem, 8cqmin, 2.5rem); line-height: 1.1; }
-        .cq-text-2xl { font-size: clamp(1.25rem, 10cqmin, 3rem); line-height: 1; }
-        .cq-text-3xl { font-size: clamp(1.5rem, 12cqmin, 4rem); line-height: 1; }
-        .cq-text-4xl { font-size: clamp(1.75rem, 15cqmin, 5rem); line-height: 1; }
-        .cq-text-5xl { font-size: clamp(2rem, 18cqmin, 6.5rem); line-height: 0.9; }
-        .cq-text-giant { font-size: clamp(2.5rem, 22cqmin, 10rem); line-height: 0.8; letter-spacing: -0.02em; }
+        /* Typography TV - Escalado Automático Perfecto basado en Ancho y Alto (Container Queries Mixtas) */
+        .cq-text-xxs { font-size: clamp(0.2rem, min(2cqw, 5cqh), 0.8rem); line-height: 1.1; }
+        .cq-text-xs  { font-size: clamp(0.3rem, min(3cqw, 8cqh), 1rem); line-height: 1.1; }
+        .cq-text-sm  { font-size: clamp(0.4rem, min(4cqw, 10cqh), 1.25rem); line-height: 1.1; }
+        .cq-text-md  { font-size: clamp(0.5rem, min(5cqw, 12cqh), 1.5rem); line-height: 1.1; }
+        .cq-text-lg  { font-size: clamp(0.6rem, min(6cqw, 15cqh), 2rem); line-height: 1.1; }
+        .cq-text-xl  { font-size: clamp(0.7rem, min(8cqw, 18cqh), 2.5rem); line-height: 1.1; }
+        .cq-text-2xl { font-size: clamp(0.8rem, min(10cqw, 20cqh), 3rem); line-height: 1; }
+        .cq-text-3xl { font-size: clamp(0.9rem, min(12cqw, 25cqh), 4rem); line-height: 1; }
+        .cq-text-4xl { font-size: clamp(1rem, min(15cqw, 30cqh), 5rem); line-height: 1; }
+        .cq-text-5xl { font-size: clamp(1.2rem, min(20cqw, 35cqh), 6.5rem); line-height: 0.9; }
+        .cq-text-giant { font-size: clamp(1.5rem, min(22cqw, 40cqh), 12rem); line-height: 0.8; letter-spacing: -0.02em; }
 
         /* ESTILOS ICONO MOVER (DRAG) - SIEMPRE VISIBLE */
         .drag-handle { 
