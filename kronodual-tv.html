@@ -3026,14 +3026,14 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             
             let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
             
-            // Agrupar coches por piloto
+            // Agrupar coches por piloto (El que se introdujo en el panel de CONFIGURACIÓN al correr)
             let pilots = {};
 
             cars.forEach(c => {
                 // Solo consideramos coches con un bestLap válido
                 if (c.bestLap && c.bestLap !== "-" && c.bestLap !== "--.---" && !c.bestLap.includes("Infinity") && c.bestLap !== "") {
-                    // Obtener el nombre del piloto (por defecto 'Piloto Desconocido')
-                    let pilotName = (c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido';
+                    // Obtener el nombre del piloto (ahora usamos c.drivenBy que se guardará al terminar la carrera, o c.pilot como fallback antiguo)
+                    let pilotName = (c.drivenBy && c.drivenBy.trim() !== '') ? c.drivenBy.trim() : ((c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido');
                     
                     if (!pilots[pilotName]) {
                         pilots[pilotName] = {
@@ -3204,7 +3204,8 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 if (c.bestLap && c.bestLap !== "-" && c.bestLap !== "--.---" && !c.bestLap.includes("Infinity") && c.bestLap !== "") {
                     // Nombre unificado del coche
                     let carName = (c.name && c.name.trim() !== '') ? c.name.trim() : `${c.marca || ''} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                    let pilotName = (c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido';
+                    // Piloto que condujo el coche (c.drivenBy guardado en la carrera)
+                    let pilotName = (c.drivenBy && c.drivenBy.trim() !== '') ? c.drivenBy.trim() : ((c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido');
                     
                     if (!groupedCars[carName]) {
                         groupedCars[carName] = {
@@ -3983,6 +3984,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     if (p.laps === 0) return;
                     
                     const activeCarName = document.getElementById(p.carId).value;
+                    const activePilotName = document.getElementById(p.nameId).value; // Nombre introducido en CONFIG
                     if (!activeCarName) return;
                     
                     let carIndex = garageCars.findIndex(c => {
@@ -3993,11 +3995,14 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     if (carIndex === -1) return;
                     let car = garageCars[carIndex];
                     
-                    // 1. Mejor Vuelta Histórica
+                    // 1. Mejor Vuelta Histórica y Piloto
                     let currentBest = parseFloat(car.bestLap) || Infinity;
                     let raceBest = p.bestLap / 1000;
                     if (raceBest > 0 && raceBest < currentBest) {
                         car.bestLap = raceBest.toFixed(3) + "s";
+                        car.drivenBy = activePilotName; // Guardamos quién hizo el récord
+                    } else if (!car.drivenBy) {
+                        car.drivenBy = activePilotName; // Si no tenía piloto registrado, le asignamos el actual
                     }
                     
                     // 2. Tiempo Acumulado
