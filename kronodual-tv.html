@@ -2017,22 +2017,28 @@
                     // P1: Yellow Neon
                     if(p1Laps[i]) { 
                         const h1 = gh * (1 - (p1Laps[i]-minVal)/range)*0.7 + gh*0.3; const barW = p2Laps ? groupW/2 - 1 : groupW; 
-                        ctx.shadowColor = '#ffff00'; ctx.shadowBlur = 10;
-                        ctx.fillStyle = '#fde047'; ctx.fillRect(x, h - padY - h1, barW, h1); 
+                        const grad = ctx.createLinearGradient(0, h - padY - h1, 0, h - padY);
+                        grad.addColorStop(0, '#fde047'); grad.addColorStop(1, 'rgba(253, 224, 71, 0.2)');
+                        ctx.shadowColor = '#ffff00'; ctx.shadowBlur = 15;
+                        ctx.fillStyle = grad; ctx.fillRect(x, h - padY - h1, barW, h1); 
+                        ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 1; ctx.strokeRect(x, h - padY - h1, barW, h1);
                         ctx.shadowBlur = 0;
                     }
                     // P2: Orange Neon
                     if(p2Laps && p2Laps[i]) { 
                         const h2 = gh * (1 - (p2Laps[i]-minVal)/range)*0.7 + gh*0.3; const barW = groupW/2 - 1; 
-                        ctx.shadowColor = '#ff4500'; ctx.shadowBlur = 10;
-                        ctx.fillStyle = '#f97316'; ctx.fillRect(x + barW + 2, h - padY - h2, barW, h2); 
+                        const grad = ctx.createLinearGradient(0, h - padY - h2, 0, h - padY);
+                        grad.addColorStop(0, '#f97316'); grad.addColorStop(1, 'rgba(249, 115, 22, 0.2)');
+                        ctx.shadowColor = '#ff4500'; ctx.shadowBlur = 15;
+                        ctx.fillStyle = grad; ctx.fillRect(x + barW + 2, h - padY - h2, barW, h2); 
+                        ctx.strokeStyle = '#fdba74'; ctx.lineWidth = 1; ctx.strokeRect(x + barW + 2, h - padY - h2, barW, h2);
                         ctx.shadowBlur = 0;
                     }
                     ctx.fillStyle = '#94a3b8'; ctx.font = 'bold 12px Rajdhani'; ctx.textAlign = 'center'; ctx.fillText(i + 1, x + groupW / 2, h - 5);
                 }
             };
 
-            window.drawSmoothCurveDual = function(canvasId, d1, d2, c1, c2) {
+            window.drawSmoothCurveDual = function(canvasId, d1, d2, c1, c2, glow1, glow2) {
                 const canvas = document.getElementById(canvasId); if (!canvas) return; 
                 const ctx = canvas.getContext('2d'); const w = canvas.clientWidth; const h = canvas.clientHeight;
                 if (w <= 0 || h <= 0) return; canvas.width = w; canvas.height = h; ctx.clearRect(0, 0, w, h);
@@ -2042,25 +2048,60 @@
                 const padX = 15; const padY = 20; const gw = w - padX * 2; const gh = h - padY * 2;
                 const stepX = maxLen > 1 ? gw / (maxLen - 1) : gw / 2;
                 
+                // Grid lines (horizontal)
+                ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+                for(let i=0; i<=4; i++) {
+                    const y = padY + (gh/4)*i;
+                    ctx.beginPath(); ctx.moveTo(padX, y); ctx.lineTo(w-padX, y); ctx.stroke();
+                }
+
                 const drawL = (data, color, shadowColor) => {
                     if(!data || data.length===0) return;
                     const pts = data.map((val, i) => ({ x: padX + i * stepX, y: h - padY - ((val - minVal) / range) * gh }));
+                    
+                    // Fill area under curve
+                    ctx.beginPath();
+                    ctx.moveTo(pts[0].x, h - padY);
+                    ctx.lineTo(pts[0].x, pts[0].y);
+                    for (let i = 0; i < pts.length - 1; i++) {
+                        const p0 = pts[i]; const p1 = pts[i+1];
+                        const cp1x = p0.x + (p1.x - p0.x) / 2; const cp2x = p1.x - (p1.x - p0.x) / 2;
+                        ctx.bezierCurveTo(cp1x, p0.y, cp2x, p1.y, p1.x, p1.y);
+                    }
+                    ctx.lineTo(pts[pts.length-1].x, h - padY);
+                    ctx.closePath();
+                    const grad = ctx.createLinearGradient(0, 0, 0, h);
+                    // Usar un color rgba semitransparente basado en el color sólido
+                    const rgb = color.startsWith('#') ? hexToRgb(color) : color;
+                    grad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
+                    grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+                    ctx.fillStyle = grad; ctx.fill();
+
+                    // Draw line
                     ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
                     for (let i = 0; i < pts.length - 1; i++) {
                         const p0 = pts[i]; const p1 = pts[i+1];
                         const cp1x = p0.x + (p1.x - p0.x) / 2; const cp2x = p1.x - (p1.x - p0.x) / 2;
                         ctx.bezierCurveTo(cp1x, p0.y, cp2x, p1.y, p1.x, p1.y);
                     }
-                    ctx.shadowColor = shadowColor; ctx.shadowBlur = 15;
+                    ctx.shadowColor = shadowColor; ctx.shadowBlur = 20;
                     ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.stroke();
                     ctx.shadowBlur = 0;
                     
                     pts.forEach(p => { 
-                        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); 
-                        ctx.fillStyle = '#0f172a'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke(); 
+                        ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI * 2); 
+                        ctx.shadowColor = shadowColor; ctx.shadowBlur = 10;
+                        ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke(); 
+                        ctx.shadowBlur = 0;
                     });
                 };
-                drawL(d1, c1, c1); if(d2) drawL(d2, c2, c2);
+
+                function hexToRgb(hex) {
+                    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0,g:0,b:0};
+                }
+
+                drawL(d1, c1, glow1); if(d2) drawL(d2, c2, glow2);
             };
 
             window.drawTVSpeedGraph = function(canvasId, p1Laps, p2Laps, trackLen) {
@@ -2068,7 +2109,7 @@
                 const p1S = p1Laps.map(t => (trLen / (t/1000))*3.6);
                 const p2S = p2Laps ? p2Laps.map(t => (trLen / (t/1000))*3.6) : null;
                 // Yellow & Orange Neon
-                window.drawSmoothCurveDual(canvasId, p1S, p2S, '#ffff00', '#ff4500');
+                window.drawSmoothCurveDual(canvasId, p1S, p2S, '#facc15', '#f97316', '#ffff00', '#ff4500');
             };
 
             window.drawTVConsistencyGraph = function(canvasId, p1Laps, p2Laps) {
@@ -2079,7 +2120,7 @@
                     return res;
                 };
                 // Laser Blue & Pink Neon
-                window.drawSmoothCurveDual(canvasId, calcCons(p1Laps), calcCons(p2Laps), '#00f3ff', '#ff00ff'); 
+                window.drawSmoothCurveDual(canvasId, calcCons(p1Laps), calcCons(p2Laps), '#38bdf8', '#f472b6', '#00f3ff', '#ff00ff'); 
             };
 
             window.drawCombinedLineGraph = function(canvasId, p1Laps, p2Laps) {
@@ -2095,12 +2136,38 @@
                 const topY = padY; const botY = padY + hTop + gap;
                 const stepX = maxLen > 1 ? gw / (maxLen - 1) : gw / 2;
                 
+                // Fondo con grid ligero
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.lineWidth = 1; ctx.beginPath();
+                for(let i=0; i<=4; i++) {
+                    const y = topY + (hTop/4)*i;
+                    ctx.moveTo(padX, y); ctx.lineTo(w-padX, y);
+                }
                 for(let i=0; i<maxLen; i++) { let x = maxLen > 1 ? padX + i * stepX : padX + gw/2; ctx.moveTo(x, padY); ctx.lineTo(x, h - padY); }
                 ctx.stroke();
 
                 const drawL = (data, color, glowColor) => {
                     if(!data || data.length===0) return;
+                    
+                    // Fill gradient
+                    ctx.beginPath();
+                    let firstX = maxLen > 1 ? padX : padX + gw/2;
+                    ctx.moveTo(firstX, topY + hTop);
+                    data.forEach((t, i) => {
+                        let x = maxLen > 1 ? padX + i * stepX : padX + gw/2;
+                        let y = topY + hTop - ((t - minT) / rangeT) * hTop; 
+                        ctx.lineTo(x, y);
+                    });
+                    let lastX = maxLen > 1 ? padX + (data.length - 1) * stepX : padX + gw/2;
+                    ctx.lineTo(lastX, topY + hTop);
+                    ctx.closePath();
+                    
+                    const grad = ctx.createLinearGradient(0, topY, 0, topY + hTop);
+                    const rgb = hexToRgb(color);
+                    grad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4)`);
+                    grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
+                    ctx.fillStyle = grad; ctx.fill();
+
+                    // Stroke
                     ctx.beginPath();
                     data.forEach((t, i) => {
                         let x = maxLen > 1 ? padX + i * stepX : padX + gw/2;
@@ -2109,19 +2176,25 @@
                     });
                     
                     ctx.shadowColor = glowColor; ctx.shadowBlur = 15;
-                    ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+                    ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke();
                     ctx.shadowBlur = 0;
 
+                    // Puntos
                     data.forEach((t, i) => {
                         let x = maxLen > 1 ? padX + i * stepX : padX + gw/2; let y = topY + hTop - ((t - minT) / rangeT) * hTop;
-                        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); 
-                        ctx.shadowColor = glowColor; ctx.shadowBlur = 8;
-                        ctx.fillStyle = '#0f172a'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke();
+                        ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); 
+                        ctx.shadowColor = glowColor; ctx.shadowBlur = 10;
+                        ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke();
                         ctx.shadowBlur = 0;
                     });
                 };
+
+                function hexToRgb(hex) {
+                    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : {r:0,g:0,b:0};
+                }
                 
-                drawL(p1Laps, '#22d3ee', '#00f3ff'); 
+                drawL(p1Laps, '#2dd4bf', '#00f3ff'); 
                 if (p2Laps) drawL(p2Laps, '#f43f5e', '#ff00ff'); 
 
                 if (p2Laps) {
@@ -2136,14 +2209,20 @@
                     deltas.forEach((d, i) => {
                         if (i === 0 && d === 0) return; 
                         let x = maxLen > 1 ? padX + i * stepX : padX + gw/2;
-                        let barH = (Math.abs(d) / maxD) * (hBot / 2 - 2); let bw = Math.max(3, Math.min(10, stepX * 0.4)); 
+                        let barH = (Math.abs(d) / maxD) * (hBot / 2 - 2); let bw = Math.max(4, Math.min(12, stepX * 0.4)); 
                         if (d > 0) { 
+                            const grad = ctx.createLinearGradient(0, zeroY - barH, 0, zeroY);
+                            grad.addColorStop(0, '#fde047'); grad.addColorStop(1, 'rgba(253,224,71,0.2)');
                             ctx.shadowColor = '#ffff00'; ctx.shadowBlur = 10;
-                            ctx.fillStyle = '#fde047'; ctx.fillRect(x - bw/2, zeroY - barH, bw, barH); 
+                            ctx.fillStyle = grad; ctx.fillRect(x - bw/2, zeroY - barH, bw, barH); 
+                            ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 1; ctx.strokeRect(x - bw/2, zeroY - barH, bw, barH);
                             ctx.shadowBlur = 0;
                         } else if (d < 0) { 
+                            const grad = ctx.createLinearGradient(0, zeroY, 0, zeroY + barH);
+                            grad.addColorStop(0, 'rgba(249,115,22,0.2)'); grad.addColorStop(1, '#f97316');
                             ctx.shadowColor = '#ff4500'; ctx.shadowBlur = 10;
-                            ctx.fillStyle = '#f97316'; ctx.fillRect(x - bw/2, zeroY, bw, barH); 
+                            ctx.fillStyle = grad; ctx.fillRect(x - bw/2, zeroY, bw, barH); 
+                            ctx.strokeStyle = '#fdba74'; ctx.lineWidth = 1; ctx.strokeRect(x - bw/2, zeroY, bw, barH);
                             ctx.shadowBlur = 0;
                         }
                     });
