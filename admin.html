@@ -6,6 +6,7 @@
     <title>Admin Krono Dual TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <style>
         /* ESTILO GOLD / DUAL */
         body { background-color: #0f172a; font-family: sans-serif; color: white; }
@@ -120,7 +121,20 @@
 
         <!-- HISTORIAL -->
         <div class="glass p-5 rounded-xl border border-slate-700">
-            <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Licencias Generadas</h3>
+            <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                <h3 class="text-xs font-bold text-slate-400 uppercase">Licencias Generadas</h3>
+                <div class="flex gap-2">
+                    <button onclick="copyEmails('all')" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded border border-slate-500 text-white transition shadow" title="Copiar todos">
+                        <i class="fas fa-copy text-yellow-400"></i> Todos
+                    </button>
+                    <button onclick="copyEmails('active')" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded border border-slate-500 text-white transition shadow" title="Copiar activos">
+                        <i class="fas fa-copy text-emerald-400"></i> Activos
+                    </button>
+                    <button onclick="copyEmails('inactive')" class="bg-slate-700 hover:bg-slate-600 text-xs px-2 py-1 rounded border border-slate-500 text-white transition shadow" title="Copiar inactivos">
+                        <i class="fas fa-copy text-red-400"></i> Inactivos
+                    </button>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="history-table">
                     <thead><tr><th>EMAIL</th><th>CÓDIGO</th><th>ESTADO</th></tr></thead>
@@ -212,19 +226,69 @@
             }
         }
 
+        window.loadedLicenses = []; // Almacena en memoria para poder filtrarlos
+
         function loadHistory() {
             try {
                 onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), (snap) => {
                     const body = document.getElementById('history-body');
                     body.innerHTML = "";
+                    window.loadedLicenses = []; // Limpiamos la lista al refrescar
+
                     snap.docs.forEach(d => {
                         const data = d.data();
                         // Actualizado para buscar las sesiones de Sensor o TV de la versión Dual
-                        const isActive = (data.current_session_tv || data.current_session_sensor) ? 'Activo' : '-';
-                        body.innerHTML += `<tr><td>${data.email}</td><td class="font-mono text-yellow-500">${data.code}</td><td>${isActive}</td></tr>`;
+                        const isActive = (data.current_session_tv || data.current_session_sensor);
+                        
+                        // Guardamos en nuestro array temporal
+                        window.loadedLicenses.push({ email: data.email, active: isActive });
+
+                        const statusText = isActive ? 'Activo' : '-';
+                        body.innerHTML += `<tr><td>${data.email}</td><td class="font-mono text-yellow-500">${data.code}</td><td>${statusText}</td></tr>`;
                     });
                 });
             } catch(e) {}
+        }
+
+        window.copyEmails = function(filter) {
+            let emailsToCopy = [];
+            
+            // Filtramos según el botón que se pulsó
+            if (filter === 'all') {
+                emailsToCopy = window.loadedLicenses.map(l => l.email);
+            } else if (filter === 'active') {
+                emailsToCopy = window.loadedLicenses.filter(l => l.active).map(l => l.email);
+            } else if (filter === 'inactive') {
+                emailsToCopy = window.loadedLicenses.filter(l => !l.active).map(l => l.email);
+            }
+
+            // Quitamos valores vacíos y limpiamos espacios
+            emailsToCopy = emailsToCopy.filter(e => e && e.trim() !== "");
+
+            if (emailsToCopy.length === 0) {
+                return window.showAlert("No hay correos en esta categoría para copiar.");
+            }
+
+            // Los juntamos separados por coma y espacio
+            const textToCopy = emailsToCopy.join(', ');
+
+            // Método compatible con el iframe para copiar al portapapeles
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px"; // Lo escondemos fuera de la pantalla
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                window.showAlert(`¡Éxito! Se han copiado ${emailsToCopy.length} correos al portapapeles.`);
+            } catch (err) {
+                console.error('Error al copiar', err);
+                window.showAlert("Error al copiar. Puede que el navegador lo esté bloqueando.");
+            } finally {
+                document.body.removeChild(textArea);
+            }
         }
 
         window.sendPaymentRequest = function() {
