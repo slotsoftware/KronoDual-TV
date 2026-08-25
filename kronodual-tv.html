@@ -138,6 +138,9 @@
         #false-start-alert.show { display: block; animation: pulse 0.5s infinite alternate; }
         @keyframes pulse { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.05); } }
         
+        #penalty-notification.show { opacity: 1 !important; transform: translate(-50%, -50%) scale(1.1) !important; animation: shake-penalty 0.4s ease-in-out; }
+        @keyframes shake-penalty { 0%, 100% { transform: translate(-50%, -50%) scale(1.1) rotate(0deg); } 25% { transform: translate(-50%, -50%) scale(1.1) rotate(-3deg); } 75% { transform: translate(-50%, -50%) scale(1.1) rotate(3deg); } }
+        
         .calib-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); color: #ffd700; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; display: none; backdrop-filter: blur(2px); }
         .calib-overlay.active { display: flex; }
         .spinner { border: 6px solid #333; border-top: 6px solid #ffd700; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin-bottom: 20px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
@@ -191,7 +194,7 @@
         @keyframes shimmer { 0% { transform: translateX(-150%) translateY(-150%) rotate(45deg); } 100% { transform: translateX(150%) translateY(150%) rotate(45deg); } }
         .animate-shimmer { animation: shimmer 3s infinite linear; }
         
-        /* Ocultar scrollbars en el modo TV para un aspecto más limpio */
+        /* Ocultar scrollbars en el modo TV pour un aspecto más limpio */
         .tv-scrollbar::-webkit-scrollbar { display: none; }
         .tv-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -310,6 +313,36 @@
         @keyframes ai-flash { 0% { opacity: 1; transform: scale(1.02); filter: contrast(1.5) brightness(1.5); } 50% { opacity: 0.8; transform: scale(0.98); filter: hue-rotate(90deg) blur(2px); } 100% { opacity: 0; transform: scale(1); filter: none; } }
         .ai-glitching { animation: ai-flash 0.6s ease-out forwards; }
 
+        /* PATRÓN CUADROS FUEL (TELEMETRÍA) */
+        .fuel-pattern {
+            background-image: 
+                linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2)), 
+                linear-gradient(45deg, rgba(0,0,0,0.2) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.2) 75%, rgba(0,0,0,0.2)) !important;
+            background-size: 6px 6px !important;
+            background-position: 0 0, 3px 3px !important;
+        }
+
+        /* --- NUEVO FUEL SEGMENTADO (CUADRITOS DIGITALES) --- */
+        .fuel-segmented-bg {
+            position: absolute; inset: 0;
+            background-color: #1e293b; /* Color de los cuadros vacíos */
+            -webkit-mask-image: repeating-linear-gradient(to right, black 0px, black 8px, transparent 8px, transparent 11px);
+            mask-image: repeating-linear-gradient(to right, black 0px, black 8px, transparent 8px, transparent 11px);
+            z-index: 0;
+        }
+        .fuel-segmented {
+            position: absolute; inset: 0;
+            /* Degradado automático de Rojo a Verde */
+            background-image: linear-gradient(to right, #ef4444 0%, #facc15 45%, #22c55e 100%);
+            -webkit-mask-image: repeating-linear-gradient(to right, black 0px, black 8px, transparent 8px, transparent 11px);
+            mask-image: repeating-linear-gradient(to right, black 0px, black 8px, transparent 8px, transparent 11px);
+            /* Recorta usando clip-path para mostrar solo el nivel de gasolina */
+            clip-path: inset(0 calc(100% - var(--fuel-level, 100%)) 0 0);
+            z-index: 10;
+            transition: clip-path 0.5s ease-out;
+            filter: drop-shadow(0 0 3px rgba(255,255,255,0.2));
+        }
+
         /* --- ESTILOS GARAJE RT SLOT (FULLSCREEN FIT NEON SPECTACULAR) --- */
         .g-box { border: 1px solid #dc2626; border-radius: 8px; background-color: rgba(10, 0, 0, 0.6); padding: 8px 12px; box-shadow: inset 0 0 10px rgba(220, 38, 38, 0.05); }
         .g-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1px 0; min-height: 24px; }
@@ -344,6 +377,12 @@
         </div>
         <div id="false-start-alert"><h2 data-lang-key="false_start">¡SALIDA NULA!</h2><p id="false-start-player" class="text-xl font-bold mt-2 text-yellow-300"></p></div>
         
+        <div id="penalty-notification" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-red-900 via-black to-red-900 p-4 sm:p-8 border-4 border-red-500 rounded-3xl z-[70] shadow-[0_0_50px_rgba(255,0,0,0.9)] text-center transition-all duration-300 opacity-0 scale-50 hidden pointer-events-none w-[90%] sm:w-auto">
+            <h2 class="text-4xl sm:text-6xl font-black uppercase text-red-500 tracking-widest drop-shadow-[0_0_15px_rgba(255,0,0,1)] mb-2" data-lang-key="penalty_title">¡PENALIZACIÓN!</h2>
+            <p id="penalty-notification-text" class="text-2xl sm:text-4xl font-bold text-white uppercase drop-shadow-md"></p>
+            <p class="text-base sm:text-2xl font-bold text-red-200 mt-3 bg-red-950/80 px-4 py-2 rounded-full border border-red-500/50 inline-block shadow-inner">+2 Segundos (Fuel)</p>
+        </div>
+
         <div id="roi-p1" class="movable-rectangle" style="top: 25%; left: 10%;"><div class="roi-label">P1</div><div id="msg-p1" class="test-msg"></div><div id="val-p1" class="detection-val">Dif: 0% | Umbral: 20</div><div class="resize-handle handle-tl"></div><div class="resize-handle handle-br"></div></div>
         <div id="roi-p2" class="movable-rectangle" style="top: 25%; left: 60%;"><div class="roi-label">P2</div><div id="msg-p2" class="test-msg"></div><div id="val-p2" class="detection-val">Dif: 0% | Umbral: 20</div><div class="resize-handle handle-tl"></div><div class="resize-handle handle-br"></div></div>
         
@@ -474,15 +513,40 @@
                         <p class="text-[9px] sm:text-[10px] text-yellow-400 font-bold tracking-[0.2em] leading-none mb-1">P1 (ORO)</p>
                         <p id="p1-current-lap" class="font-arial text-2xl sm:text-3xl font-black text-white drop-shadow-md leading-none">--.---</p>
                         <p id="p1-lap-count" class="font-arial text-gray-300 text-xs font-bold leading-none mt-1">V: 0 / 10</p>
+                        <!-- FUEL P1 -->
+                        <div class="fuel-container-ui mt-2 flex items-center justify-between gap-1 px-1 bg-black/50 rounded-lg p-1 border border-white/10 transition-all duration-300">
+                            <span class="text-[8px] font-bold text-gray-400 tracking-widest">FUEL</span>
+                            <div class="w-full bg-black rounded-sm h-2.5 shadow-inner border border-slate-700 overflow-hidden relative mx-1">
+                                <div class="fuel-segmented-bg"></div>
+                                <div id="p1-fuel-bar" class="fuel-segmented transition-all duration-500" style="--fuel-level: 100%;"></div>
+                            </div>
+                            <button onclick="window.refuelPlayer(1)" class="bg-red-700 hover:bg-red-600 text-[8px] font-black px-1.5 py-0.5 rounded text-white shadow-md border border-red-500/50 uppercase tracking-widest shrink-0 cursor-pointer pointer-events-auto relative z-50">PIT</button>
+                        </div>
                     </div>
-                    <div class="text-center flex-1 px-2">
+                    <div class="text-center flex-1 px-2 flex flex-col items-center">
                         <p class="text-[9px] sm:text-[10px] text-gray-400 font-bold tracking-[0.2em] leading-none mb-1" data-lang-key="global_time">GLOBAL</p>
                         <p id="race-time" class="font-arial text-3xl sm:text-4xl font-black text-white drop-shadow-md leading-none">00:00.000</p>
+                        <!-- FUEL TOGGLE -->
+                        <div id="fuel-toggle-btn" class="mt-2 flex items-center justify-center gap-1.5 px-2 bg-black/50 rounded-lg p-1 border border-white/10 cursor-pointer hover:bg-black/70 pointer-events-auto transition-all shadow-sm">
+                            <span class="text-[8px] font-bold text-gray-400 tracking-widest pointer-events-none">FUEL</span>
+                            <div id="fuel-toggle-track" class="w-6 h-3 bg-green-500 rounded-full relative transition-colors duration-300 pointer-events-none">
+                                <div id="fuel-toggle-thumb" class="w-3 h-3 bg-white rounded-full absolute top-0 shadow transition-all duration-300 translate-x-3 pointer-events-none"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="text-center flex-1 border-l border-white/10" id="p2-top-stats">
                         <p class="text-[9px] sm:text-[10px] text-orange-400 font-bold tracking-[0.2em] leading-none mb-1">P2 (COBRE)</p>
                         <p id="p2-current-lap" class="font-arial text-2xl sm:text-3xl font-black text-white drop-shadow-md leading-none">--.---</p>
                         <p id="p2-lap-count" class="font-arial text-gray-300 text-xs font-bold leading-none mt-1">V: 0 / 10</p>
+                        <!-- FUEL P2 -->
+                        <div class="fuel-container-ui mt-2 flex items-center justify-between gap-1 px-1 bg-black/50 rounded-lg p-1 border border-white/10 transition-all duration-300">
+                            <span class="text-[8px] font-bold text-gray-400 tracking-widest">FUEL</span>
+                            <div class="w-full bg-black rounded-sm h-2.5 shadow-inner border border-slate-700 overflow-hidden relative mx-1">
+                                <div class="fuel-segmented-bg"></div>
+                                <div id="p2-fuel-bar" class="fuel-segmented transition-all duration-500" style="--fuel-level: 100%;"></div>
+                            </div>
+                            <button onclick="window.refuelPlayer(2)" class="bg-red-700 hover:bg-red-600 text-[8px] font-black px-1.5 py-0.5 rounded text-white shadow-md border border-red-500/50 uppercase tracking-widest shrink-0 cursor-pointer pointer-events-auto relative z-50">PIT</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -493,28 +557,30 @@
             <div class="w-full bg-gradient-to-r from-yellow-600/70 via-yellow-800/30 to-transparent backdrop-blur-md border border-yellow-600/40 rounded-xl p-2 sm:p-3 shadow-[0_4px_20px_rgba(250,204,21,0.15)] flex flex-col gap-2 relative">
                 <canvas id="video-canvas" class="hidden"></canvas>
                 
-                <div class="flex items-center w-full justify-between gap-2">
-                    <div class="flex items-center space-x-1 sm:space-x-1.5 shrink-0">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center w-full justify-between gap-2">
+                    <div class="flex flex-wrap items-center gap-1 sm:gap-1.5 shrink-0">
                         <button id="camera-on-btn" class="p-1.5 rounded-lg bg-green-500/80 hover:bg-green-500 text-white transition shadow-sm border border-green-400 disabled:opacity-30">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:w-4 sm:h-4"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                         </button>
                         <button id="camera-off-btn" class="p-1.5 rounded-lg bg-red-500/80 hover:bg-red-500 text-white transition shadow-sm border border-red-400 disabled:opacity-30" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:w-4 sm:h-4"><path d="M2 2l20 20"/><path d="M4.5 17H4a2 2 0 0 1-2-2v-3h18.5"/><path d="M22 15a2 2 0 0 0-2-2h-1l-2.5-3h-2.5"/><path d="M9.5 4h5L17 7h3a2 2 0 0 1 2 2v1"/><path d="M14.5 17a3 3 0 1 1-5.6-2.5"/></svg>
                         </button>
+                        <button id="calib-p1-btn" onclick="window.runAutoCalibration(1)" class="px-2 py-1 bg-yellow-500/80 hover:bg-yellow-500 text-black text-[9px] font-bold rounded shadow-sm border border-yellow-400 transition disabled:opacity-30" disabled>CALIBRAR P1</button>
+                        <button id="calib-p2-btn" onclick="window.runAutoCalibration(2)" class="px-2 py-1 bg-orange-500/80 hover:bg-orange-500 text-black text-[9px] font-bold rounded shadow-sm border border-orange-400 transition disabled:opacity-30" disabled>CALIBRAR P2</button>
                     </div>
                     <span id="video-status" class="text-[8px] sm:text-[10px] font-bold px-2 py-1 rounded bg-white/20 text-gray-200 border border-white/30 shadow-sm shrink-0 text-center uppercase" data-lang-key="video_status_init">Inicia la cámara para 30FPS IA</span>
                 </div>
 
                 <div id="cam-controls" class="flex flex-col sm:flex-row items-center w-full gap-2 opacity-50 pointer-events-none transition-opacity">
                      <div class="flex flex-1 w-full items-center justify-between space-x-1 sm:space-x-2 bg-yellow-900/30 border border-yellow-500/50 p-1.5 rounded-lg">
-                         <button id="calib-p1-btn" onclick="window.runAutoCalibration(1)" class="px-2 py-1 bg-yellow-500/80 text-black text-[9px] font-bold rounded shrink-0">AUTO P1</button>
+                         <span class="text-[9px] text-yellow-400 font-bold uppercase tracking-widest shrink-0">Umbral P1</span>
                          <button class="btn-adjust" onclick="window.adjT(1, -1)">-</button>
                          <input type="range" id="p1-threshold" min="5" max="80" value="20" class="flex-1 h-1.5 bg-white/30 rounded-lg appearance-none cursor-pointer accent-yellow-400 min-w-[30px]" oninput="window.updateThreshold(1)">
                          <button class="btn-adjust" onclick="window.adjT(1, 1)">+</button>
                          <span id="p1-threshold-disp" class="text-[10px] text-yellow-400 font-bold shrink-0 w-4 text-center">20</span>
                      </div>
                      <div id="p2-cam-controls" class="flex flex-1 w-full items-center justify-between space-x-1 sm:space-x-2 bg-orange-900/30 border border-orange-500/50 p-1.5 rounded-lg">
-                         <button id="calib-p2-btn" onclick="window.runAutoCalibration(2)" class="px-2 py-1 bg-orange-500/80 text-black text-[9px] font-bold rounded shrink-0">AUTO P2</button>
+                         <span class="text-[9px] text-orange-400 font-bold uppercase tracking-widest shrink-0">Umbral P2</span>
                          <button class="btn-adjust" onclick="window.adjT(2, -1)">-</button>
                          <input type="range" id="p2-threshold" min="5" max="80" value="20" class="flex-1 h-1.5 bg-white/30 rounded-lg appearance-none cursor-pointer accent-orange-400 min-w-[30px]" oninput="window.updateThreshold(2)">
                          <button class="btn-adjust" onclick="window.adjT(2, 1)">+</button>
@@ -569,6 +635,12 @@
                 <div id="tv-l-4" class="light w-10 h-10 sm:w-16 sm:h-16 border-4"></div>
                 <div id="tv-l-5" class="light w-10 h-10 sm:w-16 sm:h-16 border-4"></div>
             </div>
+        </div>
+        
+        <div id="tv-penalty-alert" class="absolute top-[30%] left-1/2 transform -translate-x-1/2 z-[200] opacity-0 scale-50 pointer-events-none transition-all duration-300 hidden flex flex-col items-center justify-center bg-red-900/95 border-4 border-red-500 rounded-3xl p-8 shadow-[0_0_100px_red]">
+            <h2 class="text-6xl font-black font-rajdhani text-white drop-shadow-[0_0_20px_red] mb-2 tracking-widest">¡PENALIZACIÓN!</h2>
+            <p id="tv-penalty-name" class="text-4xl font-bold font-rajdhani text-red-200 uppercase tracking-widest drop-shadow-md"></p>
+            <p class="text-3xl font-bold font-rajdhani text-red-400 mt-4 bg-black/50 px-6 py-2 rounded-full border border-red-500/50">+2 SEGUNDOS</p>
         </div>
 
         <div class="flex justify-between items-center mb-2 z-20 relative shrink-0">
@@ -720,20 +792,54 @@
                 </div>
             </div>
 
-            <div id="w-p1-main" class="tv-widget tv-panel flex flex-col items-center justify-center border-t-4 border-yellow-400 bg-yellow-900/10 group p-2">
+            <div id="w-p1-main" class="tv-widget tv-panel flex flex-col p-3 border-t-4 border-yellow-400 bg-yellow-900/10 group">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span id="tv-p1-name" class="cq-text-4xl font-rajdhani font-black text-yellow-400 tracking-widest uppercase mb-2 pointer-events-none drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] truncate w-full text-center px-4">P1</span>
-                <span id="tv-p1-current" class="tv-font cq-text-giant font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
-                <div class="mt-2 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p1-gap" class="tv-font cq-text-2xl font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
+                
+                <div class="w-full text-center shrink-0">
+                    <span id="tv-p1-name" class="text-[clamp(1.2rem,4cqmin,3rem)] font-rajdhani font-black text-yellow-400 tracking-widest uppercase drop-shadow-[0_0_10px_rgba(250,204,21,0.6)] truncate block px-2 pointer-events-none">P1</span>
+                </div>
+                
+                <div class="w-full flex-1 flex items-center justify-center min-h-0 py-1">
+                    <span id="tv-p1-current" class="tv-font text-[clamp(2.5rem,15cqmin,10rem)] leading-none font-black text-white tracking-tighter drop-shadow-lg truncate px-2 pointer-events-none">00.000</span>
+                </div>
+                
+                <div class="w-full text-center shrink-0 min-h-0 mb-1">
+                    <span id="tv-p1-gap" class="tv-font text-[clamp(0.9rem,3cqmin,2rem)] font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate inline-block pointer-events-none">--</span>
+                </div>
+                
+                <!-- TV FUEL P1 -->
+                <div class="w-full shrink-0 px-2 mt-1 hidden sm:block">
+                    <div class="w-full bg-black rounded-sm h-3.5 shadow-[inset_0_0_8px_rgba(0,0,0,0.8)] border border-slate-700 overflow-hidden relative opacity-90 pointer-events-none">
+                        <div class="fuel-segmented-bg"></div>
+                        <div id="tv-p1-fuel-bar" class="fuel-segmented" style="--fuel-level: 100%;"></div>
+                    </div>
+                </div>
             </div>
 
-            <div id="w-p2-main" class="tv-widget tv-panel flex flex-col items-center justify-center border-t-4 border-orange-500 bg-orange-900/10 group p-2">
+            <div id="w-p2-main" class="tv-widget tv-panel flex flex-col p-3 border-t-4 border-orange-500 bg-orange-900/10 group">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-orange-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span id="tv-p2-name" class="cq-text-4xl font-rajdhani font-black text-orange-400 tracking-widest uppercase mb-2 pointer-events-none drop-shadow-[0_0_10px_rgba(249,115,22,0.6)] truncate w-full text-center px-4">P2</span>
-                <span id="tv-p2-current" class="tv-font cq-text-giant font-black text-white tracking-tighter pointer-events-none drop-shadow-lg truncate w-full text-center px-2">00.000</span>
-                <div class="mt-2 pointer-events-none w-full text-center min-h-0 px-2"><span id="tv-p2-gap" class="tv-font cq-text-2xl font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate max-w-full inline-block">--</span></div>
+                
+                <div class="w-full text-center shrink-0">
+                    <span id="tv-p2-name" class="text-[clamp(1.2rem,4cqmin,3rem)] font-rajdhani font-black text-orange-400 tracking-widest uppercase drop-shadow-[0_0_10px_rgba(249,115,22,0.6)] truncate block px-2 pointer-events-none">P2</span>
+                </div>
+                
+                <div class="w-full flex-1 flex items-center justify-center min-h-0 py-1">
+                    <span id="tv-p2-current" class="tv-font text-[clamp(2.5rem,15cqmin,10rem)] leading-none font-black text-white tracking-tighter drop-shadow-lg truncate px-2 pointer-events-none">00.000</span>
+                </div>
+                
+                <div class="w-full text-center shrink-0 min-h-0 mb-1">
+                    <span id="tv-p2-gap" class="tv-font text-[clamp(0.9rem,3cqmin,2rem)] font-bold px-4 py-1.5 rounded-lg shadow-md bg-black/30 truncate inline-block pointer-events-none">--</span>
+                </div>
+
+                <!-- TV FUEL P2 -->
+                <div class="w-full shrink-0 px-2 mt-1 hidden sm:block">
+                    <div class="w-full bg-black rounded-sm h-3.5 shadow-[inset_0_0_8px_rgba(0,0,0,0.8)] border border-slate-700 overflow-hidden relative opacity-90 pointer-events-none">
+                        <div class="fuel-segmented-bg"></div>
+                        <div id="tv-p2-fuel-bar" class="fuel-segmented" style="--fuel-level: 100%;"></div>
+                    </div>
+                </div>
             </div>
 
             <div id="w-p1-stats" class="tv-widget tv-panel flex flex-col justify-center p-4 border-l-4 border-yellow-400/50 group">
@@ -1183,16 +1289,7 @@
                 </div>
             </div>
 
-            <!-- CONTENEDOR ANÁLISIS IA (NUEVO) -->
-            <div id="ai-analysis-container" class="hidden mt-3 text-left bg-indigo-900/40 border border-indigo-500/50 p-3 sm:p-4 rounded-xl relative shadow-inner overflow-hidden">
-                <h4 class="text-indigo-300 font-bold text-xs uppercase tracking-widest mb-1 flex items-center shrink-0"><span class="mr-2 text-base">🎙️</span> <span data-lang-key="modal_ai_title">Comentarista IA en Directo</span></h4>
-                <div id="ai-analysis-content" class="text-sm text-indigo-100 font-sans italic leading-relaxed overflow-y-auto max-h-32 no-scrollbar"></div>
-            </div>
-            
             <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 shrink-0">
-                <button id="ai-analyze-btn" class="flex-1 p-2 sm:p-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center border border-indigo-400/50">
-                    ✨ <span data-lang-key="modal_ai_btn">Analizar Carrera</span>
-                </button>
                 <button id="export-excel-btn" class="flex-1 p-2 sm:p-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span data-lang-key="modal_export_btn">Exportar CSV</span>
@@ -1223,31 +1320,40 @@
 
         const translations = {
             es: { 
-                start_race: "INICIAR", config: "CONFIG", reset_race: "REINICIAR", pause: "PAUSA", resume: "REANUDAR", video_status_init: "Inicia la cámara para 30FPS IA", video_status_ready: "CÁMARA IA LISTA", video_status_off: "Cámara Apagada", completed: "Completado", winner: "Ganador:", voice_completed: "Carrera terminada", voice_winner: "Victoria para ", voice_record: "Vuelta rápida de ", voice_calibrated: "Sensores calibrados", voice_ready: "Listos", voice_false_start: "Salida Nula de",
+                start_race: "INICIAR", config: "CONFIG", reset_race: "REINICIAR", pause: "PAUSA", resume: "REANUDAR", video_status_init: "Inicia la cámara para 30FPS IA", video_status_ready: "CÁMARA IA LISTA", video_status_off: "Cámara Apagada", completed: "Completado", winner: "Ganador:", voice_completed: "Carrera terminada", voice_winner: "Victoria para ", voice_record: "Vuelta rápida de ", voice_calibrated: "Sensores calibrados", voice_ready: "Listos", voice_false_start: "Salida Nula de", voice_refuel_warning: "Atención, bajo combustible para ", voice_penalty: "Penalización de dos segundos para", voice_refueling: "Repostando ",
                 history_btn: "Historial", direct_tv_btn: "Telemetría TV", config_title: "Configuración", close_config: "Ocultar", language_label: "Idioma", game_mode_label: "Modo", mode_2p: "🏁 2 JUGADORES (Duelo)", mode_1p: "⏱️ 1 JUGADOR (Contrarreloj)", player_1: "JUGADOR 1 (ORO)", player_2: "JUGADOR 2 (COBRE)", name_label: "Nombre", car_label: "Coche", sound_p1: "Sonido", sound_p2: "Sonido", track_length_label: "Pista (m)", race_condition_label: "Carrera", voice_comments: "Voz:", safety_time_label: "Anti-Rebotes:", global_time: "GLOBAL", calibrating_title: "Calibrando Sensores...", flag_yellow: "PAUSA", false_start: "¡SALIDA NULA!", race_mode_laps: "Vueltas", race_mode_time: "Tiempo",
                 tv_stats_gold: "Estadísticas Oro", tv_stats_copper: "Estadísticas Cobre", tv_laps: "VUELTAS", tv_consistency: "CONSISTENCIA", tv_best: "MEJOR", tv_last: "ÚLTIMA", tv_avg_spd: "VEL. MED", tv_max_spd: "VEL. MÁX", tv_evol_time: "Evolución Tiempos & Delta (S)", tv_history: "Historial Cara a Cara", tv_speed_curve: "Curva Velocidad (Km/h)", tv_evol_cons: "Evolución Consistencia (%)", tv_bar_comp: "Comparativa Barras", tv_diff: "DIF",
                 tv_mode_duel: "MODO DUELO", tv_mode_time: "CONTRARRELOJ", tv_status_pause: "BANDERA AMARILLA (PAUSA)", tv_status_false_start: "SALIDA NULA", tv_status_ready: "PREPARADOS...", tv_status_racing: "CARRERA EN CURSO", tv_status_finished: "CARRERA FINALIZADA", tv_status_waiting: "ESPERANDO...", tv_status_link: "ENLACE ACTIVO. ESPERANDO COCHES...", tv_status_uplink: "ESTABLECIENDO UPLINK...", tv_status_searching: "BUSCANDO SEÑAL DE TELEMETRÍA", tv_status_inactive: "SALA INACTIVA O CERRADA", tv_status_error: "ERROR DE CONEXIÓN",
                 lap_breakdown: "Desglose de Vueltas por Piloto", csv_header: "Piloto,Vuelta,Tiempo(ms),Tiempo Formateado,Velocidad Media(km/h)\n", default_p1: "Piloto 1", default_p2: "Piloto 2", race_telemetry: "Telemetría en Vivo",
                 leader: "LÍDER", tie: "EMPATE", finish: "META", laps_short: "V: ", tv_col_v: "V", tv_global_time: "TIEMPO GLOBAL", no_laps: "Sin vueltas", best_lap_badge: "Mejor", race_finished_title: "¡Carrera Finalizada!",
-                modal_total_time: "Tiempo Total:", modal_laps: "Vueltas:", modal_best_lap: "Mejor Vuelta:", modal_consistency: "Consistencia:", modal_avg_speed: "Vel. Media:", modal_col_time: "Tiempo", modal_col_speed: "Km/h", modal_ai_title: "Comentarista IA en Directo", modal_ai_btn: "Analizar Carrera", modal_export_btn: "Exportar CSV", modal_close_btn: "Cerrar y Reiniciar", ai_analyzing: "Analizando...", ai_redo: "Rehacer Análisis IA", ai_error: "El comentarista se ha quedado sin voz. Revisa tu conexión a internet e inténtalo de nuevo.", ai_connecting: "Conectando con el comentarista IA..."
+                modal_total_time: "Tiempo Total:", modal_laps: "Vueltas:", modal_best_lap: "Mejor Vuelta:", modal_consistency: "Consistencia:", modal_avg_speed: "Vel. Media:", modal_col_time: "Tiempo", modal_col_speed: "Km/h", modal_export_btn: "Exportar CSV", modal_close_btn: "Cerrar y Reiniciar",
+                live_lead_change: ["¡Cambio de líder! {name} toma la primera posición.", "¡Espectacular adelantamiento de {name}!", "¡{name} se pone en cabeza de la carrera!"],
+                live_close_gap: ["¡Están pegados! La diferencia es mínima.", "¡Tensión máxima en la pista! Se pisan los talones.", "¡Qué batalla! No hay margen de error."],
+                live_good_pace: ["¡Qué ritmo de {name}! Es un reloj suizo.", "{name} va sobre raíles, tremenda consistencia.", "Vuelta tras vuelta, {name} mantiene un ritmo implacable."]
             },
             en: { 
-                start_race: "START", config: "CONFIG", reset_race: "RESET", pause: "PAUSE", resume: "RESUME", video_status_init: "Start camera for 30FPS AI", video_status_ready: "AI CAMERA READY", video_status_off: "Camera Off", completed: "Completed", winner: "Winner:", voice_completed: "Race finished", voice_winner: "Winner ", voice_record: "Fastest lap for ", voice_calibrated: "Sensors calibrated", voice_ready: "Ready", voice_false_start: "False start for",
+                start_race: "START", config: "CONFIG", reset_race: "RESET", pause: "PAUSE", resume: "RESUME", video_status_init: "Start camera for 30FPS AI", video_status_ready: "AI CAMERA READY", video_status_off: "Camera Off", completed: "Completed", winner: "Winner:", voice_completed: "Race finished", voice_winner: "Winner ", voice_record: "Fastest lap for ", voice_calibrated: "Sensors calibrated", voice_ready: "Ready", voice_false_start: "False start for", voice_refuel_warning: "Warning, low fuel for ", voice_penalty: "Two second penalty for", voice_refueling: "Refueling ",
                 history_btn: "History", direct_tv_btn: "TV Telemetry", config_title: "Configuration", close_config: "Hide", language_label: "Language", game_mode_label: "Mode", mode_2p: "🏁 2 PLAYERS (Duel)", mode_1p: "⏱️ 1 PLAYER (Time Trial)", player_1: "PLAYER 1 (GOLD)", player_2: "PLAYER 2 (COPPER)", name_label: "Name", car_label: "Car", sound_p1: "Sound", sound_p2: "Sound", track_length_label: "Track (m)", race_condition_label: "Race", voice_comments: "Voice:", safety_time_label: "Anti-Bounce:", global_time: "GLOBAL", calibrating_title: "Calibrating Sensors...", flag_yellow: "PAUSE", false_start: "FALSE START!", race_mode_laps: "Laps", race_mode_time: "Time",
                 tv_stats_gold: "Gold Stats", tv_stats_copper: "Copper Stats", tv_laps: "LAPS", tv_consistency: "CONSISTENCY", tv_best: "BEST", tv_last: "LAST", tv_avg_spd: "AVG SPD", tv_max_spd: "MAX SPD", tv_evol_time: "Time Evolution & Delta (S)", tv_history: "Head-to-Head History", tv_speed_curve: "Speed Curve (Km/h)", tv_evol_cons: "Consistency Evolution (%)", tv_bar_comp: "Bar Comparison", tv_diff: "DIFF",
                 tv_mode_duel: "DUEL MODE", tv_mode_time: "TIME TRIAL", tv_status_pause: "YELLOW FLAG (PAUSED)", tv_status_false_start: "FALSE START", tv_status_ready: "GET READY...", tv_status_racing: "RACE IN PROGRESS", tv_status_finished: "RACE FINISHED", tv_status_waiting: "WAITING...", tv_status_link: "LINK ACTIVE. WAITING FOR CARS...", tv_status_uplink: "ESTABLISHING UPLINK...", tv_status_searching: "SEARCHING TELEMETRY SIGNAL", tv_status_inactive: "INACTIVE OR CLOSED ROOM", tv_status_error: "CONNECTION ERROR",
                 lap_breakdown: "Lap Breakdown by Driver", csv_header: "Driver,Lap,Time(ms),Formatted Time,Avg Speed(km/h)\n", default_p1: "Driver 1", default_p2: "Driver 2", race_telemetry: "Live Telemetry",
                 leader: "LEADER", tie: "TIE", finish: "FINISH", laps_short: "L: ", tv_col_v: "L", tv_global_time: "GLOBAL TIME", no_laps: "No laps", best_lap_badge: "Best", race_finished_title: "Race Finished!",
-                modal_total_time: "Total Time:", modal_laps: "Laps:", modal_best_lap: "Best Lap:", modal_consistency: "Consistency:", modal_avg_speed: "Avg Speed:", modal_col_time: "Time", modal_col_speed: "Km/h", modal_ai_title: "Live AI Commentator", modal_ai_btn: "Analyze Race", modal_export_btn: "Export CSV", modal_close_btn: "Close & Restart", ai_analyzing: "Analyzing...", ai_redo: "Redo AI Analysis", ai_error: "The commentator lost their voice. Check your connection and try again.", ai_connecting: "Connecting to AI commentator..."
+                modal_total_time: "Total Time:", modal_laps: "Laps:", modal_best_lap: "Best Lap:", modal_consistency: "Consistency:", modal_avg_speed: "Avg Speed:", modal_col_time: "Time", modal_col_speed: "Km/h", modal_export_btn: "Export CSV", modal_close_btn: "Close & Restart",
+                live_lead_change: ["Lead change! {name} takes first place.", "Spectacular overtake by {name}!", "{name} is now in the lead!"],
+                live_close_gap: ["They are neck and neck! The gap is minimal.", "Maximum tension! Right on their tail.", "What a battle! No room for error."],
+                live_good_pace: ["What a pace by {name}! Like a Swiss watch.", "{name} is on rails, tremendous consistency.", "Lap after lap, {name} maintains a relentless pace."]
             },
             fr: {
-                start_race: "DÉMARRER", config: "CONFIG", reset_race: "RÉINITIALISER", pause: "PAUSE", resume: "REPRENDRE", video_status_init: "Démarrer caméra pour 30FPS IA", video_status_ready: "CAMÉRA IA PRÊTE", video_status_off: "Caméra Désactivée", completed: "Terminé", winner: "Gagnant:", voice_completed: "Course terminée", voice_winner: "Victoire pour ", voice_record: "Meilleur tour pour ", voice_calibrated: "Capteurs calibrés", voice_ready: "Prêts", voice_false_start: "Faux départ de",
+                start_race: "DÉMARRER", config: "CONFIG", reset_race: "RÉINITIALISER", pause: "PAUSE", resume: "REPRENDRE", video_status_init: "Démarrer caméra pour 30FPS IA", video_status_ready: "CAMÉRA IA PRÊTE", video_status_off: "Caméra Désactivée", completed: "Terminé", winner: "Gagnant:", voice_completed: "Course terminée", voice_winner: "Victoire pour ", voice_record: "Meilleur tour pour ", voice_calibrated: "Capteurs calibrés", voice_ready: "Prêts", voice_false_start: "Faux départ de", voice_refuel_warning: "Attention, niveau de carburant bas pour ", voice_penalty: "Pénalité de deux secondes pour", voice_refueling: "Ravitaillement de ",
                 history_btn: "Historique", direct_tv_btn: "Télémétrie TV", config_title: "Configuration", close_config: "Masquer", language_label: "Langue", game_mode_label: "Mode", mode_2p: "🏁 2 JOUEURS (Duel)", mode_1p: "⏱️ 1 JOUEUR (Contre-la-montre)", player_1: "JOUEUR 1 (OR)", player_2: "JOUEUR 2 (CUIVRE)", name_label: "Nom", car_label: "Voiture", sound_p1: "Son", sound_p2: "Son", track_length_label: "Piste (m)", race_condition_label: "Course", voice_comments: "Voix:", safety_time_label: "Anti-Rebond:", global_time: "GLOBAL", calibrating_title: "Calibrage Capteurs...", flag_yellow: "PAUSE", false_start: "FAUX DÉPART!", race_mode_laps: "Tours", race_mode_time: "Temps",
                 tv_stats_gold: "Stats Or", tv_stats_copper: "Stats Cuivre", tv_laps: "TOURS", tv_consistency: "CONSISTANCE", tv_best: "MEILLEUR", tv_last: "DERNIER", tv_avg_spd: "VIT MOY", tv_max_spd: "VIT MAX", tv_evol_time: "Évolution Temps & Delta (S)", tv_history: "Historique Face à Face", tv_speed_curve: "Courbe de Vitesse (Km/h)", tv_evol_cons: "Évolution Consistance (%)", tv_bar_comp: "Comparaison Barres", tv_diff: "DIFF",
                 tv_mode_duel: "MODE DUEL", tv_mode_time: "CONTRE-LA-MONTRE", tv_status_pause: "DRAPEAU JAUNE (PAUSE)", tv_status_false_start: "FAUX DÉPART", tv_status_ready: "PRÊTS...", tv_status_racing: "COURSE EN COURS", tv_status_finished: "COURSE TERMINÉE", tv_status_waiting: "EN ATTENTE...", tv_status_link: "LIEN ACTIF. EN ATTENTE DE VOITURES...", tv_status_uplink: "ÉTABLISSEMENT LIAISON...", tv_status_searching: "RECHERCHE SIGNAL TÉLÉMÉTRIE", tv_status_inactive: "SALLE INACTIVE OU FERMÉE", tv_status_error: "ERREUR DE CONNEXION",
                 lap_breakdown: "Détail des Tours par Pilote", csv_header: "Pilote,Tour,Temps(ms),Temps Formaté,Vitesse Moyenne(km/h)\n", default_p1: "Pilote 1", default_p2: "Pilote 2", race_telemetry: "Télémétrie en Direct",
                 leader: "LEADER", tie: "ÉGALITÉ", finish: "ARRIVÉE", laps_short: "T: ", tv_col_v: "T", tv_global_time: "TEMPS GLOBAL", no_laps: "Pas de tours", best_lap_badge: "Record", race_finished_title: "Course Terminée !",
-                modal_total_time: "Temps Total:", modal_laps: "Tours:", modal_best_lap: "Meilleur Tour:", modal_consistency: "Régularité:", modal_avg_speed: "Vit. Moyenne:", modal_col_time: "Temps", modal_col_speed: "Km/h", modal_ai_title: "Commentateur IA en Direct", modal_ai_btn: "Analyser Course", modal_export_btn: "Exporter CSV", modal_close_btn: "Fermer & Relancer", ai_analyzing: "Analyse en cours...", ai_redo: "Refaire l'Analyse IA", ai_error: "Le commentateur a perdu sa voix. Vérifiez votre connexion internet et réessayez.", ai_connecting: "Connexion au commentateur IA..."
+                modal_total_time: "Temps Total:", modal_laps: "Tours:", modal_best_lap: "Meilleur Tour:", modal_consistency: "Régularité:", modal_avg_speed: "Vit. Moyenne:", modal_col_time: "Temps", modal_col_speed: "Km/h", modal_export_btn: "Exporter CSV", modal_close_btn: "Fermer & Relancer",
+                live_lead_change: ["Changement de leader! {name} prend la première place.", "Dépassement spectaculaire de {name}!", "{name} prend la tête de la course!"],
+                live_close_gap: ["Ils sont au coude à coude! L'écart est minime.", "Tension maximale! Sur leurs talons.", "Quelle bataille! Pas de droit à l'erreur."],
+                live_good_pace: ["Quel rythme de {name}! Comme une horloge suisse.", "{name} est sur des rails, une constance incroyable.", "Tour après tour, {name} maintient un rythme implacable."]
             }
         };
 
@@ -1283,6 +1389,22 @@
         const synth = new Tone.Synth().toDestination();
         const polySynth = new Tone.PolySynth(Tone.Synth).toDestination();
 
+        window.playRefuelSound = function() {
+            // Eliminado a petición para dejar únicamente la voz de la locutora
+        }
+
+        window.refuelPlayer = function(pId) {
+            const p = players[pId-1];
+            // SOLUCIÓN: Solo reposta y habla si la gasolina es menor al 100%
+            if(!p.finished && p.fuel < 100) {
+                p.fuel = 100;
+                p.fuelWarningTriggered = false;
+                updateFuelUI(p);
+                speak('voice_refueling', document.getElementById(p.nameId).value);
+                if (!isTVMode) { broadcastState(); syncToCloud(); }
+            }
+        }
+
         const apiKey = ""; // Gemini API Key
 
         let cameraStream = null;
@@ -1292,6 +1414,7 @@
         let isCountdown = false;
         let raceAborted = false;
         let isCalibrating = false;
+        let isSystemReady = false;
         let raceStartTime = 0;
         let raceIntervalId = null;
         let totalLapsTarget = 10;
@@ -1303,7 +1426,16 @@
         let raceDurationTarget = 0;
         let isPaused = false;
         let pauseStartTimestamp = 0;
-        let aiAnalysisText = ""; // Nuevo estado global para el locutor IA
+        let isFuelEnabled = true; 
+
+        // Tiempos para repostaje (Boxes)
+        let pitFramesRequired = 120; // 4 segundos a 30fps
+        let autoResetFrames = 180;   // pitFramesRequired + 60
+
+        // --- VARIABLES DEL COMENTARISTA EN VIVO ---
+        let currentLeaderId = 0;
+        let lastLiveCommentTime = 0;
+        // ------------------------------------------
         
         let garageCars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
         let currentGarageIndex = 0;
@@ -1365,20 +1497,34 @@
         const players = [
             {
                 id: 1, nameId: 'p1-name', carId: 'p1-car', roiId: 'roi-p1', valId: 'val-p1', msgId: 'msg-p1',
-                lapCountId: 'p1-lap-count', currentLapId: 'p1-current-lap', bestLapId: 'p1-best-lap', lastLapId: 'p1-last-lap', avgSpeedId: 'p1-avg-speed', gapId: 'p1-gap', thresholdId: 'p1-threshold', thresholdDispId: 'p1-threshold-disp', soundId: 'p1-sound',
+                lapCountId: 'p1-lap-count', currentLapId: 'p1-current-lap', bestLapId: 'p1-best-lap', lastLapId: 'p1-last-lap', avgSpeedId: 'p1-avg-speed', gapId: 'p1-gap', thresholdId: 'p1-threshold', thresholdDispId: 'p1-threshold-disp', soundId: 'p1-sound', fuelBarId: 'p1-fuel-bar', tvFuelBarId: 'tv-p1-fuel-bar',
                 laps: 0, lapHistory: [], bestLap: Infinity, lapStartTime: 0, lastRecordTime: 0, totalTime: 0, finished: false, hasCrossedStart: false,
-                soundTone: "C5", avgSpeed: 0, maxSpeed: 0, consistency: 0,
+                soundTone: "C5", avgSpeed: 0, maxSpeed: 0, consistency: 0, fuel: 100, fuelWarningTriggered: false, penaltyTime: 0,
                 sensitivity: 20, referencePixels: null, currentChangePct: 0, noiseFloor: 0, stuckFrameCount: 0, isLineBlocked: false, isObstruction: false, gapText: "--"
             },
             {
                 id: 2, nameId: 'p2-name', carId: 'p2-car', roiId: 'roi-p2', valId: 'val-p2', msgId: 'msg-p2',
-                lapCountId: 'p2-lap-count', currentLapId: 'p2-current-lap', bestLapId: 'p2-best-lap', lastLapId: 'p2-last-lap', avgSpeedId: 'p2-avg-speed', gapId: 'p2-gap', thresholdId: 'p2-threshold', thresholdDispId: 'p2-threshold-disp', soundId: 'p2-sound',
+                lapCountId: 'p2-lap-count', currentLapId: 'p2-current-lap', bestLapId: 'p2-best-lap', lastLapId: 'p2-last-lap', avgSpeedId: 'p2-avg-speed', gapId: 'p2-gap', thresholdId: 'p2-threshold', thresholdDispId: 'p2-threshold-disp', soundId: 'p2-sound', fuelBarId: 'p2-fuel-bar', tvFuelBarId: 'tv-p2-fuel-bar',
                 laps: 0, lapHistory: [], bestLap: Infinity, lapStartTime: 0, lastRecordTime: 0, totalTime: 0, finished: false, hasCrossedStart: false,
-                soundTone: "G5", avgSpeed: 0, maxSpeed: 0, consistency: 0,
+                soundTone: "G5", avgSpeed: 0, maxSpeed: 0, consistency: 0, fuel: 100, fuelWarningTriggered: false, penaltyTime: 0,
                 sensitivity: 20, referencePixels: null, currentChangePct: 0, noiseFloor: 0, stuckFrameCount: 0, isLineBlocked: false, isObstruction: false, gapText: "--"
             }
         ];
         
+        function updateFuelUI(p) {
+            const mainBar = document.getElementById(p.fuelBarId);
+            const tvBar = document.getElementById(p.tvFuelBarId);
+            
+            let fuelVal = Math.max(0, Math.min(100, p.fuel));
+            
+            if(mainBar) {
+                mainBar.style.setProperty('--fuel-level', fuelVal + '%');
+            }
+            if(tvBar) {
+                tvBar.style.setProperty('--fuel-level', fuelVal + '%');
+            }
+        }
+
         function setLanguage(lang) {
             currentLang = lang; 
             const t = translations[lang] || translations['es'];
@@ -1411,23 +1557,60 @@
             
             window.speechSynthesis.speak(utter);
         }
+
+        // --- FUNCIONES DEL COMENTARISTA EN VIVO ---
+        function speakDirect(text) {
+            if (isTVMode && (!tvData || !tvData.voiceEnabled)) return;
+            if (!isTVMode && !voiceToggle.checked) return;
+            const utter = new SpeechSynthesisUtterance(text);
+            if (currentLang === 'es') utter.lang = 'es-ES';
+            else if (currentLang === 'fr') utter.lang = 'fr-FR';
+            else utter.lang = 'en-US';
+            utter.rate = 1.15; // Un poco más rápido y enérgico
+            utter.pitch = 1.1;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function triggerLiveCommentary(type, playerName) {
+            const now = Date.now();
+            if (now - lastLiveCommentTime < 8000) return; // Cooldown de 8 segundos para no saturar
+            
+            const t = translations[currentLang] || translations['es'];
+            let phrases = [];
+            
+            if (type === 'lead_change') phrases = t.live_lead_change || [];
+            else if (type === 'close_gap') phrases = t.live_close_gap || [];
+            else if (type === 'good_pace') phrases = t.live_good_pace || [];
+            
+            if (phrases.length > 0) {
+                let phrase = phrases[Math.floor(Math.random() * phrases.length)];
+                phrase = phrase.replace('{name}', playerName);
+                speakDirect(phrase);
+                lastLiveCommentTime = now;
+            }
+        }
+        // ------------------------------------------
+
         function setGameMode(mode) {
             activePlayers = parseInt(mode);
             const p2Config = document.getElementById('p2-config-block');
             const p2TopStats = document.getElementById('p2-top-stats');
             const p2Roi = document.getElementById('roi-p2');
             const p2CamControls = document.getElementById('p2-cam-controls');
+            const calibP2Btn = document.getElementById('calib-p2-btn');
             
             if (activePlayers === 1) {
                 if(p2Config) p2Config.style.display = 'none'; 
                 if(p2TopStats) p2TopStats.style.display = 'none'; 
                 if(p2Roi) p2Roi.style.display = 'none'; 
                 if(p2CamControls) p2CamControls.style.display = 'none';
+                if(calibP2Btn) calibP2Btn.style.display = 'none';
             } else {
                 if(p2Config) p2Config.style.display = 'block'; 
                 if(p2TopStats) p2TopStats.style.display = 'block';
                 if(isProcessing && p2Roi) p2Roi.style.display = 'block';
                 if(p2CamControls) p2CamControls.style.display = 'flex';
+                if(calibP2Btn) calibP2Btn.style.display = 'inline-block';
             }
             triggerCloudSync();
         }
@@ -1449,6 +1632,7 @@
                 videoElement.onloadedmetadata = () => {
                     videoElement.play(); canvas.width = videoElement.videoWidth; canvas.height = videoElement.videoHeight;
                     isProcessing = true; 
+                    isSystemReady = false;
                     players.forEach(p => p.referencePixels = null);
                     processVideo();
                     document.getElementById('roi-p1').style.display = 'block';
@@ -1462,6 +1646,8 @@
                     if(headerPanel) { headerPanel.classList.add('hidden'); headerPanel.classList.remove('flex'); }
                     if(timesPanel) { timesPanel.classList.add('hidden'); timesPanel.classList.remove('flex'); }
                     document.getElementById('config-panel').classList.remove('open');
+                    
+                    window.runAutoCalibrationAll();
                 };
             } catch (err) { videoStatus.textContent = 'Error: ' + err.name; }
         }
@@ -1471,6 +1657,10 @@
             cameraStream = null; isProcessing = false; videoElement.srcObject = null;
             document.querySelectorAll('.movable-rectangle').forEach(el => el.style.display = 'none');
             cameraOnBtn.disabled = false; cameraOffBtn.disabled = true; 
+            
+            document.getElementById('calib-p1-btn').disabled = true;
+            if (document.getElementById('calib-p2-btn')) document.getElementById('calib-p2-btn').disabled = true;
+
             document.getElementById('cam-controls').classList.add('opacity-50', 'pointer-events-none');
             videoStatus.textContent = translations[currentLang] ? translations[currentLang].video_status_off : "Apagada";
             
@@ -1478,13 +1668,6 @@
             const timesPanel = document.getElementById('times-traffic-panel');
             if(headerPanel) { headerPanel.classList.remove('hidden'); headerPanel.classList.add('flex'); }
             if(timesPanel) { timesPanel.classList.remove('hidden'); timesPanel.classList.add('flex'); }
-        }
-
-        function autoAdjustMargin(p, increment) {
-            let newMargin = p.sensitivity + increment;
-            p.sensitivity = Math.max(5, Math.min(80, newMargin));
-            document.getElementById(p.thresholdId).value = p.sensitivity;
-            window.updateThreshold(p.id);
         }
 
         function processVideo() {
@@ -1500,6 +1683,19 @@
 
             players.forEach(p => {
                 if (p.id > activePlayers) return;
+
+                // Evitar detecciones falsas (como repostaje) mientras se arrastra o redimensiona el ROI manualmente
+                if ((isDrag || isResize) && actRoi && actRoi.id === p.roiId) {
+                    p.referencePixels = null;
+                    p.stuckFrameCount = 0;
+                    p.isObstruction = false;
+                    document.getElementById(p.msgId).textContent = "MOVIENDO";
+                    document.getElementById(p.valId).textContent = "Ajustando...";
+                    const roiEl = document.getElementById(p.roiId);
+                    if(roiEl) { roiEl.classList.remove('roi-detected', 'roi-locked'); }
+                    return;
+                }
+
                 const roi = document.getElementById(p.roiId);
                 const rs = roi.style;
                 const l = Math.floor(vw * (parseFloat(rs.left)||0)/100);
@@ -1520,6 +1716,8 @@
                         p.referencePixels = new Float32Array(data.length);
                         for(let i=0; i<data.length; i++) p.referencePixels[i] = data[i];
                         p.currentChangePct = 0;
+                        p.clearFrames = 0;
+                        p.stuckFrameCount = 0;
                     } else {
                         let changedPixels = 0; let totalSampled = 0;
                         for (let i = 0; i < data.length; i += 8) {
@@ -1545,25 +1743,36 @@
 
                         if (crossed || p.isObstruction) {
                             p.stuckFrameCount++;
-                            if (p.stuckFrameCount > 30) {
-                                for (let i = 0; i < data.length; i++) p.referencePixels[i] = data[i];
-                                p.stuckFrameCount = 0; p.currentChangePct = 0; p.noiseFloor = 0; crossed = false; p.isObstruction = false;
-                                autoAdjustMargin(p, 3);
+                            p.clearFrames = 0;
+                            
+                            // Lógica de Repostaje en Boxes Automático (PIT)
+                            if (isSystemReady && !isCalibrating && p.stuckFrameCount === pitFramesRequired && isFuelEnabled) { 
+                                window.refuelPlayer(p.id);
+                            }
+
+                            if (p.stuckFrameCount > autoResetFrames) { 
+                                // ELIMINADO: No sobreescribimos el fondo con el coche parado.
+                                // Si lo hacíamos, al arrancar el coche la pista vacía se detectaba como obstáculo,
+                                // causando que se quedara en "BOX..." y contara vueltas fantasma.
+                                p.stuckFrameCount = autoResetFrames; // Simplemente mantenemos el contador al límite.
                             }
                         } else {
-                            p.stuckFrameCount = 0;
+                            p.clearFrames = (p.clearFrames || 0) + 1;
+                            if (p.clearFrames > 5) { // 5 frames de gracia antes de resetear el repostaje
+                                p.stuckFrameCount = 0;
+                            } else {
+                                // SOLUCIÓN: Decaimiento rápido para evitar acumulación por parpadeos de luz
+                                p.stuckFrameCount = Math.max(0, p.stuckFrameCount - 1);
+                            }
+                            
                             let isQuiet = p.currentChangePct < Math.max(3, p.sensitivity * 0.5);
-                            if (isQuiet && !isCalibrating && !p.isLineBlocked) {
+                            if (isQuiet && !isCalibrating && !p.isLineBlocked && p.clearFrames > 5) {
                                 for (let i = 0; i < data.length; i += 8) {
                                     p.referencePixels[i]   = p.referencePixels[i] * 0.95 + data[i] * 0.05;
                                     p.referencePixels[i+1] = p.referencePixels[i+1] * 0.95 + data[i+1] * 0.05;
                                     p.referencePixels[i+2] = p.referencePixels[i+2] * 0.95 + data[i+2] * 0.05;
                                 }
-                                p.noiseFloor = p.noiseFloor * 0.8 + p.currentChangePct * 0.2;
-                                p.noiseFloor = Math.min(p.noiseFloor, 10);
-                                let targetSens = Math.ceil(p.noiseFloor + 15);
-                                p.sensitivity = Math.max(18, Math.min(70, targetSens)); 
-                                document.getElementById(p.thresholdId).value = p.sensitivity; document.getElementById(p.thresholdDispId).textContent = p.sensitivity;
+                                // No se sobrescribe el umbral p.sensitivity automáticamente, respeta el ajuste manual del usuario
                             }
                         }
                     }
@@ -1571,15 +1780,19 @@
 
                 document.getElementById(p.valId).textContent = `Dif: ${p.currentChangePct.toFixed(1)}% | Umbral: ${p.sensitivity}`;
 
-                if (p.isObstruction) {
-                    roi.classList.add('roi-locked'); roi.classList.remove('roi-detected'); document.getElementById(p.msgId).textContent = "OBS";
-                } else if (crossed) {
-                    roi.classList.add('roi-detected'); roi.classList.remove('roi-locked'); document.getElementById(p.msgId).textContent = "TEST";
-                } else {
-                    roi.classList.remove('roi-detected', 'roi-locked'); document.getElementById(p.msgId).textContent = "";
-                }
+                if (!isCalibrating && isSystemReady) {
+                    if (p.stuckFrameCount >= 30 && p.stuckFrameCount < pitFramesRequired) {
+                        roi.classList.add('roi-locked'); roi.classList.remove('roi-detected'); document.getElementById(p.msgId).textContent = "BOX...";
+                    } else if (p.stuckFrameCount >= pitFramesRequired) {
+                        roi.classList.add('roi-detected'); roi.classList.remove('roi-locked'); document.getElementById(p.msgId).textContent = "¡FULL!";
+                    } else if (p.isObstruction) {
+                        roi.classList.add('roi-locked'); roi.classList.remove('roi-detected'); document.getElementById(p.msgId).textContent = "OBS";
+                    } else if (crossed) {
+                        roi.classList.add('roi-detected'); roi.classList.remove('roi-locked'); document.getElementById(p.msgId).textContent = "TEST";
+                    } else {
+                        roi.classList.remove('roi-detected', 'roi-locked'); document.getElementById(p.msgId).textContent = "";
+                    }
 
-                if (!isCalibrating) {
                     if (isCountdown && crossed && !raceAborted) handleFalseStart(p);
                     if (isRaceActive && isDetectionReady && !p.finished && !isPaused) {
                         if (p.isLineBlocked) {
@@ -1597,6 +1810,8 @@
                             }
                         }
                     }
+                } else {
+                    roi.classList.remove('roi-detected', 'roi-locked'); document.getElementById(p.msgId).textContent = "";
                 }
             });
             requestAnimationFrame(processVideo);
@@ -1612,21 +1827,95 @@
             const p = players[pId - 1]; p.referencePixels = null;
             await new Promise(r => setTimeout(r, 300));
 
-            let samples = 0; let maxChange = 0; 
+            let samples = 0; 
+            let maxChange = 0; 
+            let minChange = 100;
+            let sumChange = 0;
+            const framesToRead = 60; // 60 frames emulando lógica V3
+
             const checkInterval = setInterval(() => {
                 if (p.currentChangePct > maxChange) maxChange = p.currentChangePct;
+                if (p.currentChangePct < minChange) minChange = p.currentChangePct;
+                sumChange += p.currentChangePct;
+
                 samples++;
-                if (samples >= 30) {
+                if (samples >= framesToRead) {
                     clearInterval(checkInterval);
-                    let targetSens = Math.ceil(maxChange + 15);
+                    
+                    // Lógica copiada de la V3.0 ajustada a porcentajes
+                    let base = sumChange / framesToRead;
+                    let noise = Math.max(maxChange - base, base - minChange);
+                    let safeMargin = 15;
+                    let targetSens = Math.ceil(noise * 1.5) + safeMargin;
+                    
                     p.sensitivity = Math.max(15, Math.min(80, targetSens));
                     document.getElementById(p.thresholdId).value = p.sensitivity; window.updateThreshold(p.id);
+                    
+                    // Resetear contadores para evitar falsos repostajes justo tras calibrar
+                    p.stuckFrameCount = 0;
+                    p.clearFrames = 0;
                     
                     isCalibrating = false; calibOverlay.classList.remove('active');
                     calibOverlay.querySelector('h3').textContent = `Calibrando Sensores...`;
                     document.getElementById('calib-p1-btn').disabled = false;
                     if (document.getElementById('calib-p2-btn')) document.getElementById('calib-p2-btn').disabled = false;
                     speak('voice_calibrated', ' P' + pId);
+                }
+            }, 33);
+        }
+
+        window.runAutoCalibrationAll = async function() {
+            if (!isProcessing || isTVMode) return;
+            isCalibrating = true; 
+            calibOverlay.querySelector('h3').textContent = `Estabilizando Sistema...`; 
+            calibOverlay.classList.add('active'); 
+            
+            document.getElementById('calib-p1-btn').disabled = true;
+            if (document.getElementById('calib-p2-btn')) document.getElementById('calib-p2-btn').disabled = true;
+
+            players.forEach(p => p.referencePixels = null);
+            await new Promise(r => setTimeout(r, 800));
+
+            let samples = 0; 
+            let maxChange = [0, 0, 0];
+            let minChange = [100, 100, 100];
+            let sumChange = [0, 0, 0];
+            const framesToRead = 60;
+
+            const checkInterval = setInterval(() => {
+                players.forEach(p => {
+                    if (p.id <= activePlayers) {
+                        if (p.currentChangePct > maxChange[p.id]) maxChange[p.id] = p.currentChangePct;
+                        if (p.currentChangePct < minChange[p.id]) minChange[p.id] = p.currentChangePct;
+                        sumChange[p.id] += p.currentChangePct;
+                    }
+                });
+                samples++;
+                if (samples >= framesToRead) {
+                    clearInterval(checkInterval);
+                    players.forEach(p => {
+                        if (p.id <= activePlayers) {
+                            let base = sumChange[p.id] / framesToRead;
+                            let noise = Math.max(maxChange[p.id] - base, base - minChange[p.id]);
+                            let safeMargin = 15;
+                            let targetSens = Math.ceil(noise * 1.5) + safeMargin;
+
+                            p.sensitivity = Math.max(15, Math.min(80, targetSens));
+                            document.getElementById(p.thresholdId).value = p.sensitivity; 
+                            window.updateThreshold(p.id);
+                            p.stuckFrameCount = 0;
+                            p.clearFrames = 0;
+                            p.isLineBlocked = false;
+                        }
+                    });
+                    
+                    isCalibrating = false; 
+                    isSystemReady = true;
+                    calibOverlay.classList.remove('active');
+                    calibOverlay.querySelector('h3').textContent = `Calibrando Sensores...`;
+                    document.getElementById('calib-p1-btn').disabled = false;
+                    if (document.getElementById('calib-p2-btn')) document.getElementById('calib-p2-btn').disabled = false;
+                    speak('voice_calibrated', '');
                 }
             }, 33);
         }
@@ -1739,12 +2028,14 @@
             raceMode = raceConditionSelect.value;
             if (raceMode === 'laps') totalLapsTarget = lapLimitSelect.value==='Infinity'?Infinity:parseInt(lapLimitSelect.value); else { totalLapsTarget = Infinity; raceDurationTarget = parseInt(timeLimitSelect.value) * 60000; }
             blindTimeMs = parseInt(safetyTimeSelect.value);
-            aiAnalysisText = ""; // Limpiar texto IA
+            currentLeaderId = 0; // Reiniciar líder
+            lastLiveCommentTime = Date.now(); // Dar un tiempo de gracia antes de hablar
 
             players.forEach(p => {
                 p.soundTone = document.getElementById(p.soundId).value; p.laps=0; p.lapHistory=[]; p.bestLap=Infinity; p.totalTime=0; p.lastRecordTime=0; p.finished=false; p.hasCrossedStart=false; 
-                p.isLineBlocked=false; p.stuckFrameCount=0; p.referencePixels=null; p.gapText="--";
+                p.isLineBlocked=false; p.stuckFrameCount=0; p.referencePixels=null; p.gapText="--"; p.fuel=100; p.fuelWarningTriggered=false; p.penaltyTime=0;
                 updatePlayerUI(p); 
+                updateFuelUI(p);
                 const curLapEl = document.getElementById(p.currentLapId); if(curLapEl) curLapEl.textContent = "00.000"; 
                 const gapEl = document.getElementById(p.gapId); if(gapEl) gapEl.textContent = "--"; 
                 const roiEl = document.getElementById(p.roiId); if(roiEl) roiEl.classList.remove('roi-locked');
@@ -1778,13 +2069,11 @@
             raceIntervalId = setInterval(()=>{
                 const now = Date.now();
                 if (raceMode === 'time') {
+                    totalLapsTarget = Infinity; // Previene cualquier bug de finalización temprana por vueltas
                     let remaining = raceDurationTarget - (now - raceStartTime);
                     if (remaining <= 0) { remaining = 0; if (isRaceActive) endRace(); }
                     document.getElementById('race-time').textContent = formatTime(remaining);
                 } else { document.getElementById('race-time').textContent = formatTime(now - raceStartTime); }
-                
-                // Los tiempos individuales y el delta ya no se calculan en vivo aquí.
-                // Se congelan al cruzar la meta.
             }, 40);
         }
 
@@ -1792,7 +2081,42 @@
             const now = Date.now(); if (now - p.lastRecordTime < blindTimeMs) return; 
             
             p.lastRecordTime = now; p.isLineBlocked = true; 
-            const lapTime = now - p.lapStartTime; p.lapHistory.push(lapTime); p.laps++; p.totalTime = now - raceStartTime; p.lapStartTime = now;
+            let lapTime = now - p.lapStartTime; 
+            
+            // --- LÓGICA DE CONSUMO DE FUEL Y PENALIZACIÓN ---
+            if (isFuelEnabled) {
+                if (p.fuel <= 0) {
+                    lapTime += 2000;
+                    p.penaltyTime = (p.penaltyTime || 0) + 2000;
+                    speak('voice_penalty', " " + document.getElementById(p.nameId).value);
+                    
+                    const penAlert = document.getElementById('penalty-notification');
+                    const penText = document.getElementById('penalty-notification-text');
+                    if (penAlert && penText) {
+                        penText.textContent = document.getElementById(p.nameId).value;
+                        penAlert.classList.remove('hidden');
+                        void penAlert.offsetWidth; // Force reflow
+                        penAlert.classList.add('show');
+                        setTimeout(() => {
+                            penAlert.classList.remove('show');
+                            setTimeout(() => penAlert.classList.add('hidden'), 300);
+                        }, 3000);
+                    }
+                }
+
+                const fuelConsumed = Math.floor(Math.random() * 4) + 4; // Consume entre 4% y 7%
+                p.fuel = Math.max(0, p.fuel - fuelConsumed);
+                if (typeof updateFuelUI === 'function') updateFuelUI(p);
+                
+                // Aviso de voz de locutora al 40% (solo una vez por repostaje)
+                if (p.fuel <= 40 && !p.fuelWarningTriggered) {
+                    p.fuelWarningTriggered = true;
+                    speak('voice_refuel_warning', document.getElementById(p.nameId).value);
+                }
+            }
+            // ---------------------------------
+
+            p.lapHistory.push(lapTime); p.laps++; p.totalTime = (now - raceStartTime) + (p.penaltyTime || 0); p.lapStartTime = now;
             
             const trackLen = parseFloat(trackLengthInput.value) || 15;
             const lapSpeed = (trackLen / (lapTime / 1000)) * 3.6;
@@ -1801,12 +2125,17 @@
             let isNewRecord = false; if (lapTime < p.bestLap) { p.bestLap = lapTime; recordNotification.classList.add('show'); setTimeout(()=>recordNotification.classList.remove('show'),2000); isNewRecord = true; }
             polySynth.triggerAttackRelease(p.soundTone, "0.1", Tone.now()); 
             updatePlayerUI(p);
-            if (activePlayers === 2) updateGaps(); // Actualiza el Delta congelado al cruzar la meta
+            if (activePlayers === 2) updateGaps(); 
             
             if (isNewRecord) speak('voice_record', document.getElementById(p.nameId).value + "! " + (lapTime/1000).toFixed(2));
+            
+            // COMENTARISTA: Alabar buen ritmo y consistencia
+            if (p.laps > 3 && p.consistency > 90 && p.laps % 4 === 0) {
+                triggerLiveCommentary('good_pace', document.getElementById(p.nameId).value);
+            }
 
-            if(raceMode === 'laps' && totalLapsTarget !== Infinity) {
-                if(p.laps >= totalLapsTarget) {
+            if(raceMode === 'laps') {
+                if(totalLapsTarget !== Infinity && p.laps >= totalLapsTarget) {
                     p.finished = true; 
                     const t = translations[currentLang] || translations['es'];
                     document.getElementById(p.lapCountId).textContent = t.finish || "FIN"; 
@@ -1830,7 +2159,7 @@
             if (!p.finished) {
                 const curLapEl = document.getElementById(p.currentLapId); 
                 if (curLapEl) {
-                    if (p.laps > 0) curLapEl.textContent = lastTimeString; // El tiempo se queda CONGELADO aquí
+                    if (p.laps > 0) curLapEl.textContent = lastTimeString; 
                     else if (p.hasCrossedStart) curLapEl.textContent = "--.---";
                     else curLapEl.textContent = "00.000";
                 }
@@ -1852,16 +2181,32 @@
                  const diff = t1 - t2;
                  const diffSec = (Math.abs(diff) / 1000).toFixed(3);
                  
+                 let newLeaderId = 0;
+
                  if (diff < 0) {
                      players[0].gapText = t.leader; 
                      players[1].gapText = `+${diffSec}s`;
+                     newLeaderId = 1;
                  } else if (diff > 0) {
                      players[1].gapText = t.leader; 
                      players[0].gapText = `+${diffSec}s`;
+                     newLeaderId = 2;
                  } else {
                      players[0].gapText = t.tie; 
                      players[1].gapText = t.tie;
                  }
+
+                 // COMENTARISTA: Cambio de líder
+                 if (currentLeaderId !== 0 && newLeaderId !== 0 && currentLeaderId !== newLeaderId && minLaps > 1) {
+                     triggerLiveCommentary('lead_change', document.getElementById(players[newLeaderId-1].nameId).value);
+                 }
+                 if (newLeaderId !== 0) currentLeaderId = newLeaderId;
+
+                 // COMENTARISTA: Tensión, gap muy cercano (menos de 0.8s)
+                 if (Math.abs(diff) > 0 && Math.abs(diff) < 800 && minLaps > 2) {
+                     triggerLiveCommentary('close_gap', '');
+                 }
+
              } else {
                  players[0].gapText = "--"; 
                  players[1].gapText = "--";
@@ -1950,15 +2295,6 @@
             const resModal = document.getElementById('resultsModal');
             resModal.classList.remove('hidden');
             setTimeout(() => resModal.classList.add('open'), 50); 
-            
-            // Limpiar estado de la IA
-            const aiContainer = document.getElementById('ai-analysis-container');
-            if (aiContainer) aiContainer.classList.add('hidden');
-            const aiBtn = document.getElementById('ai-analyze-btn');
-            if (aiBtn) { 
-                aiBtn.disabled = false; 
-                aiBtn.innerHTML = `✨ <span data-lang-key="modal_ai_btn">${t.modal_ai_btn || 'Analizar Carrera'}</span>`; 
-            }
 
             speak('voice_completed'); broadcastState(); syncToCloud();
         }
@@ -1967,12 +2303,13 @@
             return {
                 timestamp: Date.now(), raceMode: raceMode, activePlayers: activePlayers, trackLength: parseFloat(trackLengthInput.value) || 15, totalLapsTarget: totalLapsTarget, raceDurationTarget: raceDurationTarget, isRaceActive: isRaceActive, isCountdown: isCountdown, isPaused: isPaused, raceAborted: raceAborted, raceStartTime: raceStartTime, currentLang: currentLang,
                 voiceEnabled: voiceToggle.checked, falseStartName: falseStartPlayerName.textContent,
-                aiAnalysisText: aiAnalysisText,
+                isFuelEnabled: isFuelEnabled,
                 players: players.map(p => {
                     return { 
                         id: p.id, name: document.getElementById(p.nameId).value, car: document.getElementById(p.carId).value, laps: p.laps, bestLap: p.bestLap, lapHistory: p.lapHistory, 
                         totalTime: p.totalTime, finished: p.finished, lapStartTime: p.lapStartTime, hasCrossedStart: p.hasCrossedStart, gapText: p.gapText || "--",
-                        avgSpeed: p.avgSpeed, maxSpeed: p.maxSpeed, consistency: p.consistency, soundTone: p.soundTone
+                        avgSpeed: p.avgSpeed, maxSpeed: p.maxSpeed, consistency: p.consistency, soundTone: p.soundTone,
+                        fuel: p.fuel, penaltyTime: p.penaltyTime || 0 // Sincroniza la gasolina y penalizaciones con la Nube y TV
                     };
                 })
             };
@@ -1996,7 +2333,6 @@
             tvBoard.classList.add('flex');
             document.title = "KRONODUAL TV DASHBOARD";
             
-            // 1. Restaurar spans personalizados (Grid Puzzle)
             const savedSizes = localStorage.getItem('krono_tv_widget_sizes');
             if (savedSizes) {
                 try {
@@ -2117,7 +2453,6 @@
                     ctx.lineTo(pts[pts.length-1].x, h - padY);
                     ctx.closePath();
                     const grad = ctx.createLinearGradient(0, 0, 0, h);
-                    // Usar un color rgba semitransparente basado en el color sólido
                     const rgb = color.startsWith('#') ? hexToRgb(color) : color;
                     grad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`);
                     grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
@@ -2154,7 +2489,6 @@
                 const trLen = trackLen || 15;
                 const p1S = p1Laps.map(t => (trLen / (t/1000))*3.6);
                 const p2S = p2Laps ? p2Laps.map(t => (trLen / (t/1000))*3.6) : null;
-                // Yellow & Orange Neon
                 window.drawSmoothCurveDual(canvasId, p1S, p2S, '#facc15', '#f97316', '#ffff00', '#ff4500');
             };
 
@@ -2165,7 +2499,6 @@
                     laps.forEach((t, i) => { tot += t; if(t < bst) bst = t; res.push((bst / (tot/(i+1))) * 100); });
                     return res;
                 };
-                // Laser Blue & Pink Neon
                 window.drawSmoothCurveDual(canvasId, calcCons(p1Laps), calcCons(p2Laps), '#38bdf8', '#f472b6', '#00f3ff', '#ff00ff'); 
             };
 
@@ -2182,7 +2515,6 @@
                 const topY = padY; const botY = padY + hTop + gap;
                 const stepX = maxLen > 1 ? gw / (maxLen - 1) : gw / 2;
                 
-                // Fondo con grid ligero
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.lineWidth = 1; ctx.beginPath();
                 for(let i=0; i<=4; i++) {
                     const y = topY + (hTop/4)*i;
@@ -2194,7 +2526,6 @@
                 const drawL = (data, color, glowColor) => {
                     if(!data || data.length===0) return;
                     
-                    // Fill gradient
                     ctx.beginPath();
                     let firstX = maxLen > 1 ? padX : padX + gw/2;
                     ctx.moveTo(firstX, topY + hTop);
@@ -2213,7 +2544,6 @@
                     grad.addColorStop(1, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0)`);
                     ctx.fillStyle = grad; ctx.fill();
 
-                    // Stroke
                     ctx.beginPath();
                     data.forEach((t, i) => {
                         let x = maxLen > 1 ? padX + i * stepX : padX + gw/2;
@@ -2225,7 +2555,6 @@
                     ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.stroke();
                     ctx.shadowBlur = 0;
 
-                    // Puntos
                     data.forEach((t, i) => {
                         let x = maxLen > 1 ? padX + i * stepX : padX + gw/2; let y = topY + hTop - ((t - minT) / rangeT) * hTop;
                         ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); 
@@ -2287,6 +2616,24 @@
                 }
             };
 
+            window.showTVPenalty = function(playerName) {
+                const el = document.getElementById('tv-penalty-alert');
+                const nameEl = document.getElementById('tv-penalty-name');
+                if (el && nameEl) {
+                    nameEl.textContent = playerName;
+                    el.classList.remove('hidden');
+                    setTimeout(() => {
+                        el.classList.remove('opacity-0', 'scale-50');
+                        el.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                    setTimeout(() => {
+                        el.classList.remove('opacity-100', 'scale-100');
+                        el.classList.add('opacity-0', 'scale-50');
+                        setTimeout(() => el.classList.add('hidden'), 300);
+                    }, 3000);
+                }
+            };
+
             function updateTVUI() {
                 if(!tvData || !tvData.players) return;
                 
@@ -2298,7 +2645,6 @@
                 const tvLights = [1,2,3,4,5].map(i => document.getElementById('tv-l-' + i));
                 const tvLightWrapper = document.getElementById('tv-traffic-light');
 
-                // --- REPRODUCCIÓN DE AUDIO, VOZ Y SEMÁFORO EN MODO TV ---
                 if (isTVMode && previousTvData) {
                     if (tvData.raceAborted && !previousTvData.raceAborted) {
                         polySynth.triggerAttackRelease(["C2", "F#2", "C3"], "1", Tone.now());
@@ -2327,10 +2673,8 @@
                         }
                         tvLights.forEach(l => { if(l) l.className = "light w-10 h-10 sm:w-16 sm:h-16 border-4"; });
 
-                        // Replicar la secuencia del semáforo en la TV
                         let beepCount = 0;
                         const tvBeepInterval = setInterval(() => {
-                            // Detener si se cancela la carrera, si la cuenta atrás termina, o si ya dimos 5 pitidos
                             if (!tvData.isCountdown || tvData.raceAborted || beepCount >= 5) {
                                 clearInterval(tvBeepInterval);
                                 return;
@@ -2345,6 +2689,12 @@
                     tvData.players.forEach(p => {
                         const prevP = previousTvData.players.find(x => x.id === p.id);
                         if (!prevP) return;
+                        
+                        // Detectar penalizaciones y mostrar en TV
+                        if ((p.penaltyTime || 0) > (prevP.penaltyTime || 0)) {
+                            window.showTVPenalty(p.name);
+                        }
+
                         if (p.laps > prevP.laps) {
                             polySynth.triggerAttackRelease(p.soundTone, "0.1", Tone.now());
                             if (p.bestLap < prevP.bestLap || (prevP.bestLap === null && p.bestLap !== null && p.laps > 1)) {
@@ -2358,19 +2708,6 @@
                     });
                     if (!tvData.isRaceActive && previousTvData.isRaceActive && !tvData.raceAborted && !tvData.isPaused) {
                         speak('voice_completed');
-                    }
-                }
-
-                // AI COMMENTATOR TV LOGIC (SOLO AUDIO)
-                if (tvData.aiAnalysisText && (!previousTvData || tvData.aiAnalysisText !== previousTvData.aiAnalysisText)) {
-                    if (isTVMode && tvData.voiceEnabled) {
-                        window.speechSynthesis.cancel(); // Detiene audios pendientes ("carrera terminada" etc.)
-                        const plainText = tvData.aiAnalysisText.replace(/<br>/g, ' ');
-                        const utter = new SpeechSynthesisUtterance(plainText);
-                        utter.lang = tvData.currentLang === 'en' ? 'en-US' : (tvData.currentLang === 'fr' ? 'fr-FR' : 'es-ES');
-                        utter.pitch = 1.1; // Darle efecto un poco más dinámico
-                        utter.rate = 1.05;
-                        window.speechSynthesis.speak(utter);
                     }
                 }
 
@@ -2405,13 +2742,12 @@
                     }
                 }
 
-                // Cambiar el icono de pausa en TV según el estado
                 const tvPauseIcon = document.getElementById('tv-pause-icon');
                 if (tvPauseIcon) {
                     if (tvData.isPaused) {
-                        tvPauseIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`; // Play
+                        tvPauseIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"/>`; 
                     } else {
-                        tvPauseIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`; // Pause
+                        tvPauseIcon.innerHTML = `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`; 
                     }
                 }
 
@@ -2448,6 +2784,14 @@
                     const hP1Car = document.getElementById('tv-header-p1-car'); if(hP1Car) hP1Car.textContent = p1.car || '-';
                     const hP1Laps = document.getElementById('tv-header-p1-laps'); 
                     if(hP1Laps) hP1Laps.textContent = tvData.raceMode === 'time' ? `${t.laps_short}${p1.laps}` : `${t.laps_short}${p1.laps} / ${tvData.totalLapsTarget===Infinity?'∞':tvData.totalLapsTarget}`;
+
+                    // --- ACTUALIZAR BARRA DE FUEL P1 EN TV ---
+                    const tvP1Fuel = document.getElementById('tv-p1-fuel-bar');
+                    if (tvP1Fuel) {
+                        tvP1Fuel.style.setProperty('--fuel-level', Math.max(0, Math.min(100, p1.fuel || 0)) + '%');
+                        if (tvData.isFuelEnabled === false) tvP1Fuel.parentElement.classList.add('opacity-30', 'grayscale');
+                        else tvP1Fuel.parentElement.classList.remove('opacity-30', 'grayscale');
+                    }
                 }
                 if (tvData.activePlayers === 2 && p2) { 
                     if(tvGridContainer) tvGridContainer.classList.remove('single-player');
@@ -2485,6 +2829,14 @@
                     const hP2Car = document.getElementById('tv-header-p2-car'); if(hP2Car) hP2Car.textContent = p2.car || '-';
                     const hP2Laps = document.getElementById('tv-header-p2-laps'); 
                     if(hP2Laps) hP2Laps.textContent = tvData.raceMode === 'time' ? `${t.laps_short}${p2.laps}` : `${t.laps_short}${p2.laps} / ${tvData.totalLapsTarget===Infinity?'∞':tvData.totalLapsTarget}`;
+
+                    // --- ACTUALIZAR BARRA DE FUEL P2 EN TV ---
+                    const tvP2Fuel = document.getElementById('tv-p2-fuel-bar');
+                    if (tvP2Fuel) {
+                        tvP2Fuel.style.setProperty('--fuel-level', Math.max(0, Math.min(100, p2.fuel || 0)) + '%');
+                        if (tvData.isFuelEnabled === false) tvP2Fuel.parentElement.classList.add('opacity-30', 'grayscale');
+                        else tvP2Fuel.parentElement.classList.remove('opacity-30', 'grayscale');
+                    }
                 } else { 
                     if(tvGridContainer) tvGridContainer.classList.add('single-player');
 
@@ -2526,11 +2878,9 @@
                     });
                 }
                 
-                // Guardar el estado actual para la próxima comparación
                 previousTvData = JSON.parse(JSON.stringify(tvData));
             }
 
-            // 1. SIEMPRE escuchar el canal local (soluciona la falta de comunicación en el mismo dispositivo)
             kronoChannel.postMessage({ type: 'REQUEST_STATE' });
             try { const savedState = localStorage.getItem('kronodual_tv_state'); if (savedState) { tvData = JSON.parse(savedState); lastReceivedLocalTime = Date.now(); updateTVUI(); } } catch(e) {}
             
@@ -2542,7 +2892,6 @@
                 } 
             };
 
-            // 2. Además, si hay código en la nube, escuchar también (se queda con los datos más recientes)
             if (cloudRoomCode) {
                 const tvCloudCodeDisplay = document.getElementById('tv-cloud-code-display');
                 tvCloudCodeDisplay.querySelector('span').textContent = (cloudRoomCode === getPortalRoomCode()) ? "AUTO-LINK" : cloudRoomCode;
@@ -2554,7 +2903,6 @@
                         window.fs.onSnapshot(window.fs.doc(window.db, 'artifacts', globalAppId, 'public', 'data', 'kronodual_tv_sessions', cloudRoomCode), (docSnap) => { 
                             if (docSnap.exists()) { 
                                 const incomingData = docSnap.data();
-                                // Solo actualiza si los datos de la nube son más recientes que los locales (o si no hay locales)
                                 if (!tvData.timestamp || incomingData.timestamp >= tvData.timestamp) {
                                     tvData = incomingData; 
                                     lastReceivedLocalTime = Date.now(); 
@@ -2569,8 +2917,6 @@
             if (tvIntervalId) clearInterval(tvIntervalId);
             tvIntervalId = setInterval(() => {
                 if (tvData && tvData.isRaceActive && !tvData.isPaused) {
-                    // MODO TV: El único cronómetro que corre es el Global. 
-                    // P1 y P2 muestran el tiempo y delta CONGELADO enviado por la telemetría móvil.
                     const estTime = tvData.timestamp ? (tvData.timestamp + (Date.now() - lastReceivedLocalTime)) : Date.now();
                     document.getElementById('tv-race-time').textContent = formatTime(Math.max(0, tvData.raceMode === 'time' ? tvData.raceDurationTarget - (estTime - tvData.raceStartTime) : estTime - tvData.raceStartTime));
                 }
@@ -2593,116 +2939,16 @@
                 setTimeout(() => { overlay.classList.remove('ai-glitching'); overlay.classList.add('hidden'); }, 600);
             });
             
-            // 9 ORGANIZACIONES AUTOMÁTICAS (PRESETS TIPO PUZZLE)
             const layouts = [
-                { // 0: Default Balanceado
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 3, rows: 1, order: 2 },
-                    'w-p2-main': { cols: 3, rows: 1, order: 3 },
-                    'w-p1-stats': { cols: 3, rows: 1, order: 4 },
-                    'w-p2-stats': { cols: 3, rows: 1, order: 5 },
-                    'w-combined-graph': { cols: 4, rows: 2, order: 6 },
-                    'w-graph': { cols: 4, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-history': { cols: 8, rows: 2, order: 10 }
-                },
-                { // 1: Tiempos Gigantes
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 6, rows: 2, order: 2 },
-                    'w-p2-main': { cols: 6, rows: 2, order: 3 },
-                    'w-p1-stats': { cols: 6, rows: 1, order: 4 },
-                    'w-p2-stats': { cols: 6, rows: 1, order: 5 },
-                    'w-combined-graph': { cols: 6, rows: 2, order: 6 },
-                    'w-graph': { cols: 6, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-history': { cols: 4, rows: 2, order: 10 }
-                },
-                { // 2: Telemetría Total
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-combined-graph': { cols: 12, rows: 3, order: 2 },
-                    'w-p1-main': { cols: 3, rows: 1, order: 3 },
-                    'w-p2-main': { cols: 3, rows: 1, order: 4 },
-                    'w-p1-stats': { cols: 3, rows: 1, order: 5 },
-                    'w-p2-stats': { cols: 3, rows: 1, order: 6 },
-                    'w-graph': { cols: 3, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 3, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 3, rows: 2, order: 9 },
-                    'w-history': { cols: 3, rows: 2, order: 10 }
-                },
-                { // 3: Historial Dominante Superior
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-history': { cols: 12, rows: 2, order: 2 },
-                    'w-p1-main': { cols: 3, rows: 1, order: 3 },
-                    'w-p2-main': { cols: 3, rows: 1, order: 4 },
-                    'w-p1-stats': { cols: 3, rows: 1, order: 5 },
-                    'w-p2-stats': { cols: 3, rows: 1, order: 6 },
-                    'w-combined-graph': { cols: 6, rows: 2, order: 7 },
-                    'w-graph': { cols: 6, rows: 2, order: 8 },
-                    'w-speed-graph': { cols: 6, rows: 2, order: 9 },
-                    'w-consistency-graph': { cols: 6, rows: 2, order: 10 }
-                },
-                { // 4: Cuadrícula Simétrica
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 4, rows: 2, order: 2 },
-                    'w-p2-main': { cols: 4, rows: 2, order: 3 },
-                    'w-combined-graph': { cols: 4, rows: 2, order: 4 },
-                    'w-p1-stats': { cols: 4, rows: 2, order: 5 },
-                    'w-p2-stats': { cols: 4, rows: 2, order: 6 },
-                    'w-graph': { cols: 4, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-history': { cols: 4, rows: 2, order: 10 }
-                },
-                { // 5: Pantalla Dividida (Split Screen VS)
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 6, rows: 2, order: 2 },
-                    'w-p2-main': { cols: 6, rows: 2, order: 3 },
-                    'w-p1-stats': { cols: 6, rows: 2, order: 4 },
-                    'w-p2-stats': { cols: 6, rows: 2, order: 5 },
-                    'w-combined-graph': { cols: 6, rows: 3, order: 6 },
-                    'w-history': { cols: 6, rows: 3, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-graph': { cols: 4, rows: 2, order: 10 }
-                },
-                { // 6: Centro de Datos (Énfasis Tablas)
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 6, rows: 1, order: 2 },
-                    'w-p2-main': { cols: 6, rows: 1, order: 3 },
-                    'w-history': { cols: 12, rows: 3, order: 4 },
-                    'w-p1-stats': { cols: 3, rows: 2, order: 5 },
-                    'w-combined-graph': { cols: 6, rows: 2, order: 6 },
-                    'w-p2-stats': { cols: 3, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-graph': { cols: 4, rows: 2, order: 10 }
-                },
-                { // 7: Analítica Visual (Gráficos Gigantes)
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-combined-graph': { cols: 12, rows: 3, order: 2 },
-                    'w-speed-graph': { cols: 6, rows: 2, order: 3 },
-                    'w-consistency-graph': { cols: 6, rows: 2, order: 4 },
-                    'w-p1-main': { cols: 3, rows: 1, order: 5 },
-                    'w-p1-stats': { cols: 3, rows: 1, order: 6 },
-                    'w-p2-stats': { cols: 3, rows: 1, order: 7 },
-                    'w-p2-main': { cols: 3, rows: 1, order: 8 },
-                    'w-history': { cols: 8, rows: 2, order: 9 },
-                    'w-graph': { cols: 4, rows: 2, order: 10 }
-                },
-                { // 8: Compacto 3 Columnas Central
-                    'w-time': { cols: 12, rows: 1, order: 1 },
-                    'w-p1-main': { cols: 4, rows: 1, order: 2 },
-                    'w-history': { cols: 4, rows: 3, order: 3 },
-                    'w-p2-main': { cols: 4, rows: 1, order: 4 },
-                    'w-p1-stats': { cols: 4, rows: 2, order: 5 },
-                    'w-p2-stats': { cols: 4, rows: 2, order: 6 },
-                    'w-combined-graph': { cols: 12, rows: 2, order: 7 },
-                    'w-speed-graph': { cols: 4, rows: 2, order: 8 },
-                    'w-graph': { cols: 4, rows: 2, order: 9 },
-                    'w-consistency-graph': { cols: 4, rows: 2, order: 10 }
-                }
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 3, rows: 1, order: 2 }, 'w-p2-main': { cols: 3, rows: 1, order: 3 }, 'w-p1-stats': { cols: 3, rows: 1, order: 4 }, 'w-p2-stats': { cols: 3, rows: 1, order: 5 }, 'w-combined-graph': { cols: 4, rows: 2, order: 6 }, 'w-graph': { cols: 4, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 8, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 1, order: 4 }, 'w-p2-stats': { cols: 6, rows: 1, order: 5 }, 'w-combined-graph': { cols: 6, rows: 2, order: 6 }, 'w-graph': { cols: 6, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 4, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-combined-graph': { cols: 12, rows: 3, order: 2 }, 'w-p1-main': { cols: 3, rows: 1, order: 3 }, 'w-p2-main': { cols: 3, rows: 1, order: 4 }, 'w-p1-stats': { cols: 3, rows: 1, order: 5 }, 'w-p2-stats': { cols: 3, rows: 1, order: 6 }, 'w-graph': { cols: 3, rows: 2, order: 7 }, 'w-speed-graph': { cols: 3, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 3, rows: 2, order: 9 }, 'w-history': { cols: 3, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-history': { cols: 12, rows: 2, order: 2 }, 'w-p1-main': { cols: 3, rows: 1, order: 3 }, 'w-p2-main': { cols: 3, rows: 1, order: 4 }, 'w-p1-stats': { cols: 3, rows: 1, order: 5 }, 'w-p2-stats': { cols: 3, rows: 1, order: 6 }, 'w-combined-graph': { cols: 6, rows: 2, order: 7 }, 'w-graph': { cols: 6, rows: 2, order: 8 }, 'w-speed-graph': { cols: 6, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 6, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 4, rows: 2, order: 2 }, 'w-p2-main': { cols: 4, rows: 2, order: 3 }, 'w-combined-graph': { cols: 4, rows: 2, order: 4 }, 'w-p1-stats': { cols: 4, rows: 2, order: 5 }, 'w-p2-stats': { cols: 4, rows: 2, order: 6 }, 'w-graph': { cols: 4, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 4, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 2, order: 4 }, 'w-p2-stats': { cols: 6, rows: 2, order: 5 }, 'w-combined-graph': { cols: 6, rows: 3, order: 6 }, 'w-history': { cols: 6, rows: 3, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 1, order: 2 }, 'w-p2-main': { cols: 6, rows: 1, order: 3 }, 'w-history': { cols: 12, rows: 3, order: 4 }, 'w-p1-stats': { cols: 3, rows: 2, order: 5 }, 'w-combined-graph': { cols: 6, rows: 2, order: 6 }, 'w-p2-stats': { cols: 3, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-combined-graph': { cols: 12, rows: 3, order: 2 }, 'w-speed-graph': { cols: 6, rows: 2, order: 3 }, 'w-consistency-graph': { cols: 6, rows: 2, order: 4 }, 'w-p1-main': { cols: 3, rows: 1, order: 5 }, 'w-p1-stats': { cols: 3, rows: 1, order: 6 }, 'w-p2-stats': { cols: 3, rows: 1, order: 7 }, 'w-p2-main': { cols: 3, rows: 1, order: 8 }, 'w-history': { cols: 8, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 4, rows: 1, order: 2 }, 'w-history': { cols: 4, rows: 3, order: 3 }, 'w-p2-main': { cols: 4, rows: 1, order: 4 }, 'w-p1-stats': { cols: 4, rows: 2, order: 5 }, 'w-p2-stats': { cols: 4, rows: 2, order: 6 }, 'w-combined-graph': { cols: 12, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-graph': { cols: 4, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 10 } }
             ];
             
             let currentTvLayoutIndex = 0;
@@ -2715,7 +2961,6 @@
                 const widgetSizes = {};
                 const widgetOrder = [];
 
-                // Reordenar elementos físicamente en el DOM
                 const elements = Array.from(tvGrid.children);
                 elements.sort((a, b) => {
                     const orderA = layout[a.id] ? layout[a.id].order : 99;
@@ -2724,7 +2969,7 @@
                 });
                 
                 elements.forEach(el => {
-                    tvGrid.appendChild(el); // Lo mueve en el DOM
+                    tvGrid.appendChild(el); 
                     widgetOrder.push(el.id);
                     if (layout[el.id]) {
                         el.style.gridColumnEnd = `span ${layout[el.id].cols}`;
@@ -2744,84 +2989,6 @@
             });
         };
 
-        // INTEGRACIÓN LLM: GEMINI API
-        async function analyzeRaceWithAI() {
-            const btn = document.getElementById('ai-analyze-btn');
-            const container = document.getElementById('ai-analysis-container');
-            const content = document.getElementById('ai-analysis-content');
-            const t = translations[currentLang] || translations['es'];
-            
-            if (!btn || !container || !content) return;
-            
-            btn.disabled = true;
-            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${t.ai_analyzing || 'Analizando...'}`;
-            container.classList.remove('hidden');
-            content.innerHTML = `<span class="animate-pulse">${t.ai_connecting || 'Conectando con el comentarista IA...'}</span>`;
-
-            // Extraer telemetría de la carrera para el Prompt
-            let raceDataStr = `Modo de carrera: ${raceMode === 'laps' ? totalLapsTarget + ' Vueltas' : formatTime(raceDurationTarget) + ' Tiempo'}.\n`;
-            players.forEach(p => {
-                if (p.id > activePlayers) return;
-                const name = document.getElementById(p.nameId).value;
-                const car = document.getElementById(p.carId).value;
-                raceDataStr += `Piloto ${p.id} (${name}) con ${car}: Completó ${p.laps} vueltas. Mejor vuelta: ${formatTime(p.bestLap)}. Vel media: ${(p.avgSpeed || 0).toFixed(1)} km/h. Consistencia: ${(p.consistency || 0).toFixed(1)}%.\n`;
-            });
-            const winnerText = document.getElementById('winner-text').textContent;
-            raceDataStr += `Resultado final: ${winnerText}`;
-            
-            const targetLangStr = currentLang === 'en' ? 'Inglés' : currentLang === 'fr' ? 'Francés' : 'Español';
-
-            const promptText = `Actúa como un comentarista deportivo de carreras de motor (especialista en Scalextric/Slot) muy entusiasta, apasionado y algo excéntrico.
-La carrera acaba de terminar. Aquí tienes la telemetría oficial extraída de los sensores:
-${raceDataStr}
-
-Escribe un resumen épico (máximo 3 o 4 líneas) narrando el final de la carrera, celebrando al ganador, mencionando algún detalle técnico como la velocidad media, la lucha por la constancia o el mejor tiempo, usando un tono increíblemente emocionante.
-
-IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
-
-            let retries = 5;
-            let delay = 1000;
-            let success = false;
-            let resultText = "";
-
-            while (retries > 0 && !success) {
-                try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: promptText }] }],
-                            systemInstruction: { parts: [{ text: "Eres un comentarista de carreras de slot. Usa un tono vibrante, dinámico y muy humano." }] }
-                        })
-                    });
-                    
-                    if (!response.ok) throw new Error('Error en la llamada a la API');
-                    
-                    const data = await response.json();
-                    resultText = data.candidates?.[0]?.content?.parts?.[0]?.text || "La IA no ha podido generar el análisis.";
-                    success = true;
-                } catch (err) {
-                    retries--;
-                    if (retries > 0) {
-                        await new Promise(r => setTimeout(r, delay));
-                        delay *= 2;
-                    }
-                }
-            }
-
-            if (success) {
-                aiAnalysisText = resultText.replace(/\n/g, '<br>');
-                content.innerHTML = aiAnalysisText;
-                broadcastState(); syncToCloud(); // <-- Sincronizar inmediatamente al TV
-            } else {
-                content.innerHTML = `<span class="text-red-400">${t.ai_error || 'El comentarista se ha quedado sin voz. Revisa tu conexión a internet e inténtalo de nuevo.'}</span>`;
-            }
-
-            btn.disabled = false;
-            btn.innerHTML = `✨ ${t.ai_redo || 'Rehacer Análisis IA'}`;
-        }
-
-        // 7. EVENT LISTENERS
         document.getElementById('start-race-btn').onclick = async () => { 
             await Tone.start();
             startRace(); 
@@ -2830,13 +2997,13 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             isRaceActive = false; 
             isPaused = false; 
             isCountdown = false;
-            raceAborted = true; // Fundamental para matar cualquier cuenta atrás activa
+            raceAborted = true; 
             clearInterval(raceIntervalId); 
-            aiAnalysisText = ""; // Limpiar texto IA
+            currentLeaderId = 0;
             
             startRaceBtn.disabled = false; 
             pauseRaceBtn.disabled = true;
-            resetRaceBtn.disabled = true; // Se deshabilita hasta iniciar una nueva carrera
+            resetRaceBtn.disabled = true; 
             
             const t = translations[currentLang] || translations['es'];
             pauseText.textContent = t.pause || "PAUSA";
@@ -2852,8 +3019,9 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
             document.getElementById('race-time').textContent = raceMode === 'time' ? formatTime(raceDurationTarget) : "00:00.000"; 
             players.forEach(p => {
-                p.laps=0; p.lapHistory=[]; p.bestLap=Infinity; p.totalTime=0; p.finished=false; p.hasCrossedStart=false; p.gapText="--";
+                p.laps=0; p.lapHistory=[]; p.bestLap=Infinity; p.totalTime=0; p.finished=false; p.hasCrossedStart=false; p.gapText="--"; p.fuel=100; p.fuelWarningTriggered=false; p.penaltyTime=0;
                 updatePlayerUI(p); 
+                if (typeof updateFuelUI === 'function') updateFuelUI(p);
                 const curLapEl = document.getElementById(p.currentLapId); if(curLapEl) curLapEl.textContent = "00.000"; 
                 const gapEl = document.getElementById(p.gapId); if(gapEl) gapEl.textContent = "--"; 
             });
@@ -2905,7 +3073,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         document.getElementById('pause-race-btn').onclick = togglePause;
         document.getElementById('camera-on-btn').onclick = startWebcam; 
         document.getElementById('camera-off-btn').onclick = stopWebcam;
-        if(document.getElementById('ai-analyze-btn')) document.getElementById('ai-analyze-btn').onclick = analyzeRaceWithAI;
         
         document.getElementById('modal-restart-btn').onclick = () => { 
             const resModal = document.getElementById('resultsModal');
@@ -2918,6 +3085,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 isCountdown = false;
                 raceAborted = true;
                 clearInterval(raceIntervalId); 
+                currentLeaderId = 0;
                 
                 startRaceBtn.disabled = false; 
                 pauseRaceBtn.disabled = true;
@@ -2930,8 +3098,9 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 document.getElementById('race-time').textContent = raceMode === 'time' ? formatTime(raceDurationTarget) : "00:00.000"; 
                 
                 players.forEach(p => {
-                    p.laps=0; p.lapHistory=[]; p.bestLap=Infinity; p.totalTime=0; p.finished=false; p.hasCrossedStart=false; p.gapText="--";
+                    p.laps=0; p.lapHistory=[]; p.bestLap=Infinity; p.totalTime=0; p.finished=false; p.hasCrossedStart=false; p.gapText="--"; p.fuel=100; p.fuelWarningTriggered=false; p.penaltyTime=0;
                     updatePlayerUI(p); 
+                    if (typeof updateFuelUI === 'function') updateFuelUI(p);
                     const curLapEl = document.getElementById(p.currentLapId); if(curLapEl) curLapEl.textContent = "00.000"; 
                     const gapEl = document.getElementById(p.gapId); if(gapEl) gapEl.textContent = "--"; 
                 });
@@ -3008,7 +3177,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             triggerCloudSync(); 
         });
         
-        // --- RANKING MODAL LOGIC ---
         const rankingModal = document.getElementById('rankingModal');
         const openRankingBtn = document.getElementById('open-ranking-btn');
         const closeRankingBtn = document.getElementById('close-ranking-btn');
@@ -3020,12 +3188,10 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             
             let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
             
-            // Filtramos coches que tengan un bestLap válido
             let validCars = cars.filter(c => {
                 return c.bestLap && c.bestLap !== "-" && c.bestLap !== "--.---" && !c.bestLap.includes("Infinity") && c.bestLap !== "";
             });
 
-            // Parseamos a float para ordenar
             validCars.forEach(c => {
                 c._numTime = parseFloat(c.bestLap.replace('s', '').replace(',', '.'));
             });
@@ -3137,7 +3303,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     localStorage.setItem('kronodual_garage_cars', JSON.stringify(cars));
                     garageCars = cars; 
                     if (typeof saveGarageToCloud === 'function') saveGarageToCloud(); 
-                    openRanking(); // Refrescar vista
+                    openRanking(); 
                 }
             });
         }
@@ -3148,7 +3314,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             setTimeout(() => rankingModal.classList.add('hidden'), 300);
         });
 
-        // --- DRIVER RANKING MODAL LOGIC ---
         const driverRankingModal = document.getElementById('driverRankingModal');
         const openDriverRankingBtn = document.getElementById('open-driver-ranking-btn');
         const closeDriverRankingBtn = document.getElementById('close-driver-ranking-btn');
@@ -3159,13 +3324,10 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             
             let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
             
-            // Agrupar coches por piloto (El que se introdujo en el panel de CONFIGURACIÓN al correr)
             let pilots = {};
 
             cars.forEach(c => {
-                // Solo consideramos coches con un bestLap válido
                 if (c.bestLap && c.bestLap !== "-" && c.bestLap !== "--.---" && !c.bestLap.includes("Infinity") && c.bestLap !== "") {
-                    // Obtener el nombre del piloto (ahora usamos c.drivenBy que se guardará al terminar la carrera, o c.pilot como fallback antiguo)
                     let pilotName = (c.drivenBy && c.drivenBy.trim() !== '') ? c.drivenBy.trim() : ((c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido');
                     
                     if (!pilots[pilotName]) {
@@ -3183,14 +3345,12 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     
                     pilots[pilotName].carsCount++;
                     
-                    // Tiempo de vuelta
                     let numTime = parseFloat(c.bestLap.replace('s', '').replace(',', '.'));
                     if (numTime < pilots[pilotName].bestOverallTime) {
                         pilots[pilotName].bestOverallTime = numTime;
                         pilots[pilotName].bestCarName = c.name || `${c.marca || ''} ${c.ref || ''}`.trim() || 'Coche Desconocido';
                     }
 
-                    // Acumulados para estadísticas medias
                     pilots[pilotName].totalRawTime += (c._rawTotalTime || 0);
                     pilots[pilotName].totalRawDist += (c._rawTotalDist || 0);
                     
@@ -3204,7 +3364,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
             let validPilots = Object.values(pilots);
 
-            // Ordenar por el mejor tiempo absoluto
             validPilots.sort((a, b) => a.bestOverallTime - b.bestOverallTime);
 
             if (validPilots.length === 0) {
@@ -3220,7 +3379,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     
                     let avgCons = p.consistencyCount > 0 ? (p.consistencySum / p.consistencyCount).toFixed(1) + '%' : '-';
                     
-                    // Calcular velocidad media global del piloto si tiene tiempo y distancia
                     let avgSpdStr = '0.0 km/h';
                     if (p.totalRawTime > 0 && p.totalRawDist > 0) {
                         let avgSpdMs = (p.totalRawDist * 1000) / (p.totalRawTime / 1000);
@@ -3318,7 +3476,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             });
         }
 
-        // --- PERSONAL RANKING MODAL LOGIC (AGRUPADO POR COCHE) ---
         const personalRankingModal = document.getElementById('personalRankingModal');
         const openPersonalRankingBtn = document.getElementById('open-personal-ranking-btn');
         const closePersonalRankingBtn = document.getElementById('close-personal-ranking-btn');
@@ -3329,15 +3486,11 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             
             let cars = JSON.parse(localStorage.getItem('kronodual_garage_cars')) || [];
             
-            // Agrupar entradas del garaje por el Nombre del coche
             let groupedCars = {};
 
             cars.forEach(c => {
-                // Solo consideramos entradas con un bestLap válido
                 if (c.bestLap && c.bestLap !== "-" && c.bestLap !== "--.---" && !c.bestLap.includes("Infinity") && c.bestLap !== "") {
-                    // Nombre unificado del coche
                     let carName = (c.name && c.name.trim() !== '') ? c.name.trim() : `${c.marca || ''} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                    // Piloto que condujo el coche (c.drivenBy guardado en la carrera)
                     let pilotName = (c.drivenBy && c.drivenBy.trim() !== '') ? c.drivenBy.trim() : ((c.pilot && c.pilot.trim() !== '') ? c.pilot.trim() : 'Piloto Desconocido');
                     
                     if (!groupedCars[carName]) {
@@ -3355,14 +3508,12 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     
                     groupedCars[carName].pilotsSet.add(pilotName);
                     
-                    // Comprobar y actualizar el mejor tiempo absoluto para este modelo
                     let numTime = parseFloat(c.bestLap.replace('s', '').replace(',', '.'));
                     if (numTime < groupedCars[carName].bestOverallTime) {
                         groupedCars[carName].bestOverallTime = numTime;
                         groupedCars[carName].bestPilotName = pilotName;
                     }
 
-                    // Acumular estadísticas globales de este coche
                     groupedCars[carName].totalRawTime += (c._rawTotalTime || 0);
                     groupedCars[carName].totalRawDist += (c._rawTotalDist || 0);
                     
@@ -3376,7 +3527,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
             let validGroups = Object.values(groupedCars);
 
-            // Ordenar de más rápido a más lento
             validGroups.sort((a, b) => a.bestOverallTime - b.bestOverallTime);
 
             if (validGroups.length === 0) {
@@ -3405,7 +3555,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     let subTextColor = 'text-slate-400';
                     let highlightColor = 'text-slate-300';
                     
-                    // Colores de Podium: Rosa, Morado, Violeta
                     if (idx === 0) {
                         borderGlow = 'border-pink-400/60 shadow-[0_0_20px_rgba(244,114,182,0.15)] bg-gradient-to-br from-pink-900/30 to-slate-900/90';
                         posColor = 'text-pink-300 drop-shadow-[0_0_10px_rgba(244,114,182,0.8)]';
@@ -3531,7 +3680,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
 
         document.body.addEventListener('click', async () => { if (isTVMode) await Tone.start(); }, { once: true });
 
-        // LOGICAS DE DRAG ORIGINAL DE CÁMARAS
         let actRoi=null, isDrag=false, isResize=false, resizeHandle=null, startX=0, startY=0, startLeft=0, startTop=0, startWidth=0, startHeight=0;
         function getEventPos(e) { return e.touches ? e.touches[0] : e; }
         function dragStart(e) {
@@ -3576,7 +3724,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         }
         videoContainer.addEventListener('mousedown', dragStart); videoContainer.addEventListener('touchstart', dragStart, {passive: false}); document.addEventListener('mousemove', dragMove); document.addEventListener('touchmove', dragMove, {passive: false}); document.addEventListener('mouseup', dragEnd); document.addEventListener('touchend', dragEnd);
 
-        // FUNCIONES DE RESIZE TIPO PUZZLE PARA WIDGETS DEL TV DASHBOARD
         let isTvResize = false, tvResizingWidget = null, startTvW = 0, startTvH = 0, startTvX = 0, startTvY = 0;
 
         function startTvResizing(e) {
@@ -3595,17 +3742,16 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             const pos = e.touches ? e.touches[0] : e;
             const dx = pos.clientX - startTvX; const dy = pos.clientY - startTvY;
             
-            // Grid Cálculos de encaje
             const gridW = tvResizingWidget.parentElement.clientWidth;
-            const colW = (gridW - (11 * 16)) / 12; // 12 columns, 11 gaps of 1rem(16px)
-            const rowH = 140; // Base row height
+            const colW = (gridW - (11 * 16)) / 12; 
+            const rowH = 140; 
             const gap = 16;
             
             let newCols = Math.round((startTvW + dx + gap) / (colW + gap));
             let newRows = Math.round((startTvH + dy + gap) / (rowH + gap));
             
-            newCols = Math.max(3, Math.min(12, newCols)); // Min 3 columnas (25%), Max 12 (100%)
-            newRows = Math.max(1, Math.min(8, newRows)); // Min 1 fila, max 8
+            newCols = Math.max(3, Math.min(12, newCols)); 
+            newRows = Math.max(1, Math.min(8, newRows)); 
             
             tvResizingWidget.style.gridColumnEnd = `span ${newCols}`;
             tvResizingWidget.style.gridRowEnd = `span ${newRows}`;
@@ -3634,7 +3780,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         document.addEventListener('mouseup', stopTvResizing);
         document.addEventListener('touchend', stopTvResizing);
 
-        // SISTEMA DE GUARDADO AUTOMÁTICO DE CONFIGURACIÓN
         function saveLocalConfig() {
             const fieldsToSave = ['p1-name', 'p1-car', 'p2-name', 'p2-car', 'track-length-input', 'p1-sound', 'p2-sound', 'game-mode-select', 'race-condition-select', 'lap-limit-select', 'time-limit-select', 'safety-time-select'];
             fieldsToSave.forEach(id => {
@@ -3665,7 +3810,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         }
 
         window.onload = () => {
-            ImageDB.init(); // Iniciar BD de imágenes
+            ImageDB.init(); 
             window.updateThreshold(1); window.updateThreshold(2);
             loadLocalConfig();
             loadHistoryLists();
@@ -3685,7 +3830,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 }
             });
 
-            // Previsualización de sonidos al cambiarlos
             ['p1-sound', 'p2-sound'].forEach(id => {
                 const selectEl = document.getElementById(id);
                 if (selectEl) {
@@ -3695,6 +3839,25 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     });
                 }
             });
+
+            const fuelToggleBtn = document.getElementById('fuel-toggle-btn');
+            if (fuelToggleBtn) {
+                fuelToggleBtn.addEventListener('click', () => {
+                    isFuelEnabled = !isFuelEnabled;
+                    const track = document.getElementById('fuel-toggle-track');
+                    const thumb = document.getElementById('fuel-toggle-thumb');
+                    if (isFuelEnabled) {
+                        track.classList.replace('bg-gray-600', 'bg-green-500');
+                        thumb.classList.replace('translate-x-0', 'translate-x-3');
+                        document.querySelectorAll('.fuel-container-ui').forEach(el => el.classList.remove('opacity-30', 'pointer-events-none', 'grayscale'));
+                    } else {
+                        track.classList.replace('bg-green-500', 'bg-gray-600');
+                        thumb.classList.replace('translate-x-3', 'translate-x-0');
+                        document.querySelectorAll('.fuel-container-ui').forEach(el => el.classList.add('opacity-30', 'pointer-events-none', 'grayscale'));
+                    }
+                    if (!isTVMode) { broadcastState(); syncToCloud(); }
+                });
+            }
             
             if (urlParams.get('tv') === 'true') window.startTVMode(urlParams.get('room') || window.myRoomCode);
             else { 
@@ -3710,19 +3873,17 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                         window.fs.onSnapshot(cmdDocRef, (docSnap) => {
                             if (docSnap.exists()) {
                                 const cmd = docSnap.data();
-                                // Si es la primera vez que lee, guardamos el último comando para no ejecutar acciones viejas al cargar
                                 if (isFirstCommandSnapshot) {
                                     isFirstCommandSnapshot = false;
                                     lastProcessedCmdId = cmd.cmdId;
                                     return;
                                 }
-                                // Ejecuta solo si el ID de comando es diferente al último procesado
                                 if (cmd.cmdId && cmd.cmdId !== lastProcessedCmdId) {
                                     lastProcessedCmdId = cmd.cmdId;
                                     handleRemoteCommand(cmd.action);
                                 }
                             } else {
-                                isFirstCommandSnapshot = false; // Aún no hay comandos creados
+                                isFirstCommandSnapshot = false; 
                             }
                         });
                     }
@@ -3730,12 +3891,10 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             }
         };
 
-        // Identificador único para evitar comandos en bucle o ignorados por desincronización de reloj
         let lastProcessedCmdId = null;
         let isFirstCommandSnapshot = true; 
         
         function handleRemoteCommand(action) {
-            // Manejar comandos en formato objeto (como asignar coches desde la TV)
             if (typeof action === 'object') {
                 if (action.type === 'SET_CAR') {
                     const inputEl = document.getElementById(action.player === 1 ? 'p1-car' : 'p2-car');
@@ -3751,21 +3910,18 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             if (action === 'PAUSE') {
                 togglePause();
             } else if (action === 'NEW_RACE') {
-                // Comprobamos si el modal de resultados está abierto
                 const resModal = document.getElementById('resultsModal');
                 if (resModal && !resModal.classList.contains('hidden')) {
                     const modalRestartBtn = document.getElementById('modal-restart-btn');
-                    if (modalRestartBtn) modalRestartBtn.click(); // Cierra el modal y resetea la carrera
+                    if (modalRestartBtn) modalRestartBtn.click(); 
                     
-                    // Esperamos a que la animación de cierre termine antes de iniciar
                     setTimeout(() => {
                         const startBtn = document.getElementById('start-race-btn');
                         if (startBtn && !startBtn.disabled) startBtn.click();
                     }, 400);
-                    return; // Salimos para no ejecutar el reseteo estándar de abajo
+                    return; 
                 }
 
-                // Reseteo estándar si el modal no estaba abierto
                 const resetBtn = document.getElementById('reset-race-btn');
                 if (resetBtn && !resetBtn.disabled) resetBtn.click();
                 setTimeout(() => {
@@ -3787,13 +3943,12 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             };
         }
 
-        // --- BOTONES CONTROL REMOTO TV Y RECEPCIÓN DE COMANDOS ---
         const tvRemotePauseBtn = document.getElementById('tv-remote-pause-btn');
         const tvRemoteResetBtn = document.getElementById('tv-remote-reset-btn');
 
         function sendRemoteCommand(action) {
             const now = Date.now();
-            const cmdId = now.toString(36) + Math.random().toString(36).substring(2, 6); // Generador de ID Único
+            const cmdId = now.toString(36) + Math.random().toString(36).substring(2, 6); 
             
             if (!isTVMode && typeof handleRemoteCommand === 'function') {
                 lastProcessedCmdId = cmdId;
@@ -3812,9 +3967,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         if (tvRemotePauseBtn) tvRemotePauseBtn.onclick = () => sendRemoteCommand('PAUSE');
         if (tvRemoteResetBtn) tvRemoteResetBtn.onclick = () => sendRemoteCommand('NEW_RACE');
 
-        // =========================================================================
-        // MÓDULO GARAJE (RT SLOT) ADAPTADO PARA DUAL
-        // =========================================================================
         const garageModal = document.getElementById('garageModal');
         const closeGarageBtn = document.getElementById('close-garage-btn');
         const garageContainer = document.getElementById('garage-container');
@@ -3835,7 +3987,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         const importBtn = document.getElementById('garage-import-btn');
         const importInput = document.getElementById('garage-import-input');
 
-        // Funciones del sistema Nube Garaje
         async function saveGarageToCloud() {
             if (!window.db || !window.fs || isSyncingFromCloud) return;
             try {
@@ -3845,7 +3996,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 let jsonStr = JSON.stringify(payload);
                 
                 if (jsonStr.length > 900000) { 
-                    // Limpieza solo de imágenes "antiguas/legacy" incrustadas, el nuevo sistema no las incluye
                     for (let i = 0; i < exportCars.length; i++) {
                         if (exportCars[i].image) {
                             exportCars[i].image = "";
@@ -3956,7 +4106,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 let exportCars = JSON.parse(JSON.stringify(garageCars));
                 let jsonStr = JSON.stringify(exportCars);
                 
-                // Límite de seguridad para LocalStorage. El nuevo sistema evade esto porque la foto no va en jsonStr
                 if (jsonStr.length > 4500000) {
                     for(let i = 0; i < exportCars.length; i++) {
                         if (exportCars[i].image) {
@@ -4006,14 +4155,13 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='12' font-weight='900' stroke='none' fill='%2322d3ee' text-anchor='middle' letter-spacing='1' filter='url(%23neonGlow)'%3EPHOTO CAR%3C/text%3E%3C/svg%3E";
             
             const imgEl = document.getElementById('garage-img');
-            imgEl.src = ""; // Limpiar visualmente para cargar
+            imgEl.src = ""; 
 
             if (car.imageId) {
                 ImageDB.get(car.imageId).then(base64 => {
                     if (base64) {
                         imgEl.src = base64;
                     } else {
-                        // Rescate en la nube si no está en caché
                         fetchImageFromCloud(car.imageId).then(cloudBase64 => {
                             if (cloudBase64) {
                                 ImageDB.save(car.imageId, cloudBase64);
@@ -4025,7 +4173,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     }
                 });
             } else if (car.image) {
-                imgEl.src = car.image; // Mantiene compatibilidad con coches guardados antes de la V.4
+                imgEl.src = car.image; 
             } else {
                 imgEl.src = defaultImg;
             }
@@ -4099,7 +4247,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             if (garageCars.length === 0) initGarage();
             else populateDropdown();
             
-            // Buscar si el coche activo de P1 o P2 es el que mostramos (Priorizamos P1)
             const p1CarName = document.getElementById('p1-car') ? document.getElementById('p1-car').value : '';
             let foundIndex = garageCars.findIndex(c => {
                 const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
@@ -4145,7 +4292,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         if(editBtn) editBtn.addEventListener('click', () => toggleGarageEdit(true));
         if(saveBtn) saveBtn.addEventListener('click', saveGarageEdits);
 
-        // Auto-actualizar stats en Dual (Para P1 y P2)
         window.updateGarageCarStatsAfterRace = function() {
             try {
                 if (!garageCars || garageCars.length === 0) return;
@@ -4157,7 +4303,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     if (p.laps === 0) return;
                     
                     const activeCarName = document.getElementById(p.carId).value;
-                    const activePilotName = document.getElementById(p.nameId).value; // Nombre introducido en CONFIG
+                    const activePilotName = document.getElementById(p.nameId).value; 
                     if (!activeCarName) return;
                     
                     let carIndex = garageCars.findIndex(c => {
@@ -4168,17 +4314,15 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     if (carIndex === -1) return;
                     let car = garageCars[carIndex];
                     
-                    // 1. Mejor Vuelta Histórica y Piloto
                     let currentBest = parseFloat(car.bestLap) || Infinity;
                     let raceBest = p.bestLap / 1000;
                     if (raceBest > 0 && raceBest < currentBest) {
                         car.bestLap = raceBest.toFixed(3) + "s";
-                        car.drivenBy = activePilotName; // Guardamos quién hizo el récord
+                        car.drivenBy = activePilotName; 
                     } else if (!car.drivenBy) {
-                        car.drivenBy = activePilotName; // Si no tenía piloto registrado, le asignamos el actual
+                        car.drivenBy = activePilotName; 
                     }
                     
-                    // 2. Tiempo Acumulado
                     let rawTime = car._rawTotalTime || 0;
                     if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s" && car.totalTime !== "-") {
                         let h = 0, m = 0, s = 0;
@@ -4199,7 +4343,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     let s = totalSecs % 60;
                     car.totalTime = `${h}h ${m}m ${s}s`;
                     
-                    // 3. Recorrido
                     let rawDist = car._rawTotalDist || 0;
                     if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km" && car.totalDist !== "-") {
                         rawDist = parseFloat(car.totalDist) || 0;
@@ -4209,7 +4352,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     car._rawTotalDist = rawDist;
                     car.totalDist = rawDist.toFixed(3) + " km";
                     
-                    // 4. Velocidades Medias
                     if (rawTime > 0) {
                         let avgSpdMs = (rawDist * 1000) / (rawTime / 1000);
                         let avgSpdKmh = avgSpdMs * 3.6;
@@ -4217,7 +4359,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                         car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
                     }
                     
-                    // 5. Constancia
                     let currentCons = parseFloat(car.consistency) || 0;
                     if (p.consistency > 0 && isFinite(p.consistency)) {
                         if (currentCons === 0) {
@@ -4290,7 +4431,7 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 400; const MAX_HEIGHT = 400; // Incrementado sin riesgo
+                    const MAX_WIDTH = 400; const MAX_HEIGHT = 400; 
                     let width = img.width; let height = img.height;
                     if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
                     else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
@@ -4304,14 +4445,14 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                         const car = garageCars[currentGarageIndex];
                         const imgId = "img_" + (car.id || Date.now()) + "_" + Date.now();
                         
-                        car.imageId = imgId; // Usamos la nueva referencia
-                        car.image = ""; // Vaciamos el antiguo base64 (si existía) para liberar el JSON
+                        car.imageId = imgId; 
+                        car.image = ""; 
                         
                         ImageDB.save(imgId, base64Str);
                         document.getElementById('garage-img').src = base64Str;
                         
                         saveGarageToLocal();
-                        syncImageToCloud(imgId, base64Str); // Se sube aislada para no romper los límites
+                        syncImageToCloud(imgId, base64Str); 
                         
                         if (typeof loadHistoryLists === 'function') loadHistoryLists();
                     }
@@ -4405,7 +4546,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             });
         }
         
-        // Asignación rápida de coches a Pilotos
         function assignCarToPlayer(playerNum) {
             if (garageCars.length === 0) return;
             const car = garageCars[currentGarageIndex];
@@ -4415,17 +4555,14 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
             const carInputEl = document.getElementById(carInputId);
             
             if (carInputEl) {
-                // 1. Forzar la actualización local en el input de la config
                 carInputEl.value = carName;
                 saveLocalConfig();
                 
-                // 2. Forzar la actualización directa en el DOM del Modo TV (Asegura el cambio visual al instante)
                 const tvCarTitle = document.getElementById(`tv-header-p${playerNum}-car`);
                 if (tvCarTitle) {
                     tvCarTitle.textContent = carName;
                 }
                 
-                // 3. Flujo normal de estado
                 if (isTVMode) {
                     if (tvData && tvData.players) {
                         const p = tvData.players.find(x => x.id === playerNum);
@@ -4437,7 +4574,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
                     syncToCloud();
                 }
                 
-                // Confirmación visual
                 const btn = document.getElementById(`garage-assign-p${playerNum}-btn`);
                 const originalText = btn.innerHTML;
                 btn.innerHTML = "¡ASIGNADO!";
@@ -4453,7 +4589,6 @@ IMPORTANTE: Escribe tu respuesta ÚNICAMENTE en el idioma: ${targetLangStr}.`;
         if(assignP1Btn) assignP1Btn.addEventListener('click', () => assignCarToPlayer(1));
         if(assignP2Btn) assignP2Btn.addEventListener('click', () => assignCarToPlayer(2));
 
-        // Listeners para abrir garaje desde botones principales añadidos en el HTML principal
         const openGarageBtn = document.getElementById('open-garage-btn');
         if (openGarageBtn) openGarageBtn.addEventListener('click', openGarage);
         
