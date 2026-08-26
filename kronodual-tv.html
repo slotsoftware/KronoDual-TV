@@ -934,10 +934,10 @@
                     <table class="w-full text-left table-fixed">
                         <thead class="sticky top-0 bg-slate-800/90 backdrop-blur z-10">
                             <tr>
-                                <th class="py-1 px-1 text-slate-400 font-rajdhani cq-text-md text-center w-[15%] truncate" data-lang-key="tv_col_v">V</th>
-                                <th class="py-1 px-1 text-yellow-400 font-rajdhani cq-text-md text-center w-[25%] truncate">P1</th>
-                                <th class="py-1 px-1 text-orange-400 font-rajdhani cq-text-md text-center w-[25%] truncate">P2</th>
-                                <th class="py-1 px-1 text-slate-400 font-rajdhani cq-text-md text-right w-[35%] truncate" data-lang-key="tv_diff">DIF</th>
+                                <th class="py-2 px-2 text-slate-400 font-rajdhani cq-text-lg text-center w-[15%] truncate" data-lang-key="tv_col_v">V</th>
+                                <th class="py-2 px-2 text-yellow-400 font-rajdhani cq-text-lg text-center w-[25%] truncate">P1</th>
+                                <th class="py-2 px-2 text-orange-400 font-rajdhani cq-text-lg text-center w-[25%] truncate">P2</th>
+                                <th class="py-2 px-2 text-slate-400 font-rajdhani cq-text-lg text-right w-[35%] truncate" data-lang-key="tv_diff">DIF</th>
                             </tr>
                         </thead>
                         <tbody id="tv-lap-tbody" class="tv-font text-slate-200"></tbody>
@@ -2875,14 +2875,14 @@
                         tr.className = 'border-b border-slate-700/50 hover:bg-slate-700/30';
                         const t1 = p1Laps[i] ? formatTime(p1Laps[i]) : '-';
                         const t2 = (p2Laps && p2Laps[i]) ? formatTime(p2Laps[i]) : '-';
-                        let dif = '<td class="py-1 px-1 cq-text-sm font-bold text-right text-slate-500 truncate">-</td>';
+                        let dif = '<td class="py-2 px-2 cq-text-lg font-bold text-right text-slate-500 truncate">-</td>';
                         if (p1Laps[i] && p2Laps && p2Laps[i]) {
                             const d = p1Laps[i] - p2Laps[i];
-                            if (d < 0) dif = `<td class="py-1 px-1 cq-text-sm font-bold text-right text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] truncate">P1 -${(Math.abs(d)/1000).toFixed(3)}</td>`;
-                            else if (d > 0) dif = `<td class="py-1 px-1 cq-text-sm font-bold text-right text-orange-400 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] truncate">P2 -${(d/1000).toFixed(3)}</td>`;
-                            else dif = `<td class="py-1 px-1 cq-text-sm font-bold text-right text-slate-400 truncate">0.000</td>`;
+                            if (d < 0) dif = `<td class="py-2 px-2 cq-text-lg font-bold text-right text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] truncate">P1 -${(Math.abs(d)/1000).toFixed(3)}</td>`;
+                            else if (d > 0) dif = `<td class="py-2 px-2 cq-text-lg font-bold text-right text-orange-400 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] truncate">P2 -${(d/1000).toFixed(3)}</td>`;
+                            else dif = `<td class="py-2 px-2 cq-text-lg font-bold text-right text-slate-400 truncate">0.000</td>`;
                         }
-                        tr.innerHTML = `<td class="py-1 px-1 cq-text-sm font-bold text-center text-slate-400 truncate">${i+1}</td><td class="py-1 px-1 cq-text-sm font-bold text-center text-yellow-400 truncate">${t1}</td><td class="py-1 px-1 cq-text-sm font-bold text-center text-orange-400 truncate">${tvData.activePlayers===2?t2:''}</td>${tvData.activePlayers===2?dif:''}`;
+                        tr.innerHTML = `<td class="py-2 px-2 cq-text-lg font-bold text-center text-slate-400 truncate">${i+1}</td><td class="py-2 px-2 cq-text-lg font-bold text-center text-yellow-400 truncate">${t1}</td><td class="py-2 px-2 cq-text-lg font-bold text-center text-orange-400 truncate">${tvData.activePlayers===2?t2:''}</td>${tvData.activePlayers===2?dif:''}`;
                         tbody.appendChild(tr);
                     }
                     
@@ -2958,15 +2958,22 @@
             });
             
             const layouts = [
+                // 0: DEFAULT EQUILIBRADO
                 { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 3, rows: 1, order: 2 }, 'w-p2-main': { cols: 3, rows: 1, order: 3 }, 'w-p1-stats': { cols: 3, rows: 1, order: 4 }, 'w-p2-stats': { cols: 3, rows: 1, order: 5 }, 'w-combined-graph': { cols: 4, rows: 2, order: 6 }, 'w-graph': { cols: 4, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 8, rows: 2, order: 10 } },
+                
+                // 1: NUEVO - GIGANTESCO PARA DATOS (Gráficas abajo en miniatura)
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 3, order: 4 }, 'w-p2-stats': { cols: 6, rows: 3, order: 5 }, 'w-history': { cols: 12, rows: 4, order: 6 }, 'w-combined-graph': { cols: 3, rows: 2, order: 7 }, 'w-graph': { cols: 3, rows: 2, order: 8 }, 'w-speed-graph': { cols: 3, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 3, rows: 2, order: 10 } },
+                
+                // 2: NUEVO - HISTORIAL ENORME LATERAL (Focus en tabla y tiempos)
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-history': { cols: 6, rows: 6, order: 2 }, 'w-p1-main': { cols: 3, rows: 2, order: 3 }, 'w-p1-stats': { cols: 3, rows: 2, order: 4 }, 'w-p2-main': { cols: 3, rows: 2, order: 5 }, 'w-p2-stats': { cols: 3, rows: 2, order: 6 }, 'w-combined-graph': { cols: 6, rows: 2, order: 7 }, 'w-graph': { cols: 6, rows: 2, order: 8 }, 'w-speed-graph': { cols: 6, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 6, rows: 2, order: 10 } },
+                
+                // 3: NUEVO - STATS VERTICALES GIGANTES
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 4, rows: 3, order: 2 }, 'w-p1-stats': { cols: 4, rows: 3, order: 3 }, 'w-history': { cols: 4, rows: 6, order: 4 }, 'w-p2-main': { cols: 4, rows: 3, order: 5 }, 'w-p2-stats': { cols: 4, rows: 3, order: 6 }, 'w-combined-graph': { cols: 3, rows: 2, order: 7 }, 'w-graph': { cols: 3, rows: 2, order: 8 }, 'w-speed-graph': { cols: 3, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 3, rows: 2, order: 10 } },
+
+                // Resto de layouts (Opciones extra)
                 { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 1, order: 4 }, 'w-p2-stats': { cols: 6, rows: 1, order: 5 }, 'w-combined-graph': { cols: 6, rows: 2, order: 6 }, 'w-graph': { cols: 6, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 4, rows: 2, order: 10 } },
                 { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-combined-graph': { cols: 12, rows: 3, order: 2 }, 'w-p1-main': { cols: 3, rows: 1, order: 3 }, 'w-p2-main': { cols: 3, rows: 1, order: 4 }, 'w-p1-stats': { cols: 3, rows: 1, order: 5 }, 'w-p2-stats': { cols: 3, rows: 1, order: 6 }, 'w-graph': { cols: 3, rows: 2, order: 7 }, 'w-speed-graph': { cols: 3, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 3, rows: 2, order: 9 }, 'w-history': { cols: 3, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-history': { cols: 12, rows: 2, order: 2 }, 'w-p1-main': { cols: 3, rows: 1, order: 3 }, 'w-p2-main': { cols: 3, rows: 1, order: 4 }, 'w-p1-stats': { cols: 3, rows: 1, order: 5 }, 'w-p2-stats': { cols: 3, rows: 1, order: 6 }, 'w-combined-graph': { cols: 6, rows: 2, order: 7 }, 'w-graph': { cols: 6, rows: 2, order: 8 }, 'w-speed-graph': { cols: 6, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 6, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 4, rows: 2, order: 2 }, 'w-p2-main': { cols: 4, rows: 2, order: 3 }, 'w-combined-graph': { cols: 4, rows: 2, order: 4 }, 'w-p1-stats': { cols: 4, rows: 2, order: 5 }, 'w-p2-stats': { cols: 4, rows: 2, order: 6 }, 'w-graph': { cols: 4, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-history': { cols: 4, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 2, order: 4 }, 'w-p2-stats': { cols: 6, rows: 2, order: 5 }, 'w-combined-graph': { cols: 6, rows: 3, order: 6 }, 'w-history': { cols: 6, rows: 3, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 1, order: 2 }, 'w-p2-main': { cols: 6, rows: 1, order: 3 }, 'w-history': { cols: 12, rows: 3, order: 4 }, 'w-p1-stats': { cols: 3, rows: 2, order: 5 }, 'w-combined-graph': { cols: 6, rows: 2, order: 6 }, 'w-p2-stats': { cols: 3, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-combined-graph': { cols: 12, rows: 3, order: 2 }, 'w-speed-graph': { cols: 6, rows: 2, order: 3 }, 'w-consistency-graph': { cols: 6, rows: 2, order: 4 }, 'w-p1-main': { cols: 3, rows: 1, order: 5 }, 'w-p1-stats': { cols: 3, rows: 1, order: 6 }, 'w-p2-stats': { cols: 3, rows: 1, order: 7 }, 'w-p2-main': { cols: 3, rows: 1, order: 8 }, 'w-history': { cols: 8, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } },
-                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 4, rows: 1, order: 2 }, 'w-history': { cols: 4, rows: 3, order: 3 }, 'w-p2-main': { cols: 4, rows: 1, order: 4 }, 'w-p1-stats': { cols: 4, rows: 2, order: 5 }, 'w-p2-stats': { cols: 4, rows: 2, order: 6 }, 'w-combined-graph': { cols: 12, rows: 2, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-graph': { cols: 4, rows: 2, order: 9 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 10 } }
+                { 'w-time': { cols: 12, rows: 1, order: 1 }, 'w-p1-main': { cols: 6, rows: 2, order: 2 }, 'w-p2-main': { cols: 6, rows: 2, order: 3 }, 'w-p1-stats': { cols: 6, rows: 2, order: 4 }, 'w-p2-stats': { cols: 6, rows: 2, order: 5 }, 'w-combined-graph': { cols: 6, rows: 3, order: 6 }, 'w-history': { cols: 6, rows: 3, order: 7 }, 'w-speed-graph': { cols: 4, rows: 2, order: 8 }, 'w-consistency-graph': { cols: 4, rows: 2, order: 9 }, 'w-graph': { cols: 4, rows: 2, order: 10 } }
             ];
             
             let currentTvLayoutIndex = 0;
