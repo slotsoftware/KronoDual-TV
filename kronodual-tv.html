@@ -250,49 +250,51 @@
         /* ESTILOS ICONO MOVER (DRAG) - SIEMPRE VISIBLE */
         .drag-handle { 
             position: absolute !important; 
-            top: 10px !important; 
-            right: 10px !important;
+            top: 6px !important; 
+            right: 6px !important;
             cursor: grab !important; 
             touch-action: none !important; 
             z-index: 50 !important;
             background: rgba(15, 23, 42, 0.9) !important;
             border: 1px solid rgba(255,255,255,0.2) !important;
-            border-radius: 6px !important;
-            padding: 6px !important;
+            border-radius: 4px !important;
+            padding: 4px !important;
             opacity: 1 !important; /* Fuerza la visibilidad */
             display: flex !important; 
             align-items: center !important; 
             justify-content: center !important;
             pointer-events: auto !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
             transition: all 0.1s ease !important;
         }
+        .drag-handle svg { width: 14px !important; height: 14px !important; }
         .drag-handle:hover { transform: scale(1.1); background: rgba(250, 204, 21, 0.2) !important; border-color: #facc15 !important; color: #facc15 !important; }
         .drag-handle:active { cursor: grabbing !important; transform: scale(0.95); background: rgba(250, 204, 21, 0.4) !important; }
         
         /* ESTILOS CUADRADITO ESCALAR (RESIZE) - SIEMPRE VISIBLE */
         .resize-widget-handle { 
             position: absolute !important;
-            bottom: 10px !important;
-            right: 10px !important;
-            width: 32px !important;
-            height: 32px !important;
+            bottom: 6px !important;
+            right: 6px !important;
+            width: 24px !important;
+            height: 24px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             background: rgba(15, 23, 42, 0.9) !important;
             border: 1px solid rgba(255,255,255,0.2) !important;
-            border-radius: 6px !important;
+            border-radius: 4px !important;
             opacity: 1 !important;
             z-index: 50 !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
             transition: all 0.1s ease !important;
             cursor: se-resize !important;
-            padding: 6px !important;
+            padding: 4px !important;
             pointer-events: auto !important;
             color: #facc15 !important; /* Dedo de color amarillo puro */
             touch-action: none !important;
         }
+        .resize-widget-handle svg { width: 14px !important; height: 14px !important; }
         .resize-widget-handle:hover, .resize-widget-handle:active {
             transform: scale(1.1) !important;
             background: rgba(250, 204, 21, 0.2) !important;
@@ -771,24 +773,32 @@
         <div id="tv-grid-container" class="flex-1 min-h-0 tv-grid-layout tv-scrollbar">
             
             <div id="w-time" class="tv-widget tv-panel flex flex-row justify-between items-center px-4 sm:px-8 border-b-2 border-slate-600/50 group">
-                <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
-                <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
+                <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-1.5 -m-1.5 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
+                <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
                 
-                <div class="flex flex-col items-start w-1/3 pointer-events-none py-2 min-w-0 pr-2">
-                    <span id="tv-header-p1-name" class="text-yellow-400 font-rajdhani font-black cq-text-3xl uppercase truncate w-full tracking-wider drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">P1</span>
-                    <span id="tv-header-p1-car" class="text-slate-300 font-rajdhani font-bold cq-text-sm truncate w-full opacity-90">-</span>
-                    <span id="tv-header-p1-laps" class="text-yellow-300 font-rajdhani font-bold cq-text-2xl mt-1 drop-shadow truncate w-full">V: 0</span>
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between w-[40%] pointer-events-none py-2 min-w-0 pr-2 gap-2 md:gap-4">
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <span id="tv-header-p1-name" class="text-yellow-400 font-rajdhani font-black cq-text-4xl uppercase truncate w-full tracking-wider drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">P1</span>
+                        <span id="tv-header-p1-car" class="text-slate-300 font-rajdhani font-bold cq-text-lg truncate w-full opacity-90">-</span>
+                    </div>
+                    <div class="shrink-0 bg-black/40 border border-yellow-500/30 rounded-xl px-4 py-2 shadow-inner">
+                        <span id="tv-header-p1-laps" class="text-yellow-300 font-rajdhani font-black cq-text-3xl drop-shadow truncate">V: 0</span>
+                    </div>
                 </div>
 
-                <div class="flex flex-col items-center w-1/3 pointer-events-none min-w-0 px-2">
-                    <span class="text-slate-400 font-rajdhani font-semibold cq-text-sm mb-1 tracking-widest truncate w-full text-center" data-lang-key="tv_global_time">TIEMPO GLOBAL</span>
-                    <span id="tv-race-time" class="tv-font cq-text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] truncate w-full text-center">00:00.0</span>
+                <div class="flex flex-col items-center justify-center w-[20%] pointer-events-none min-w-0 px-2 shrink-0">
+                    <span class="text-slate-400 font-rajdhani font-bold cq-text-lg mb-1 tracking-widest truncate w-full text-center" data-lang-key="tv_global_time">TIEMPO GLOBAL</span>
+                    <span id="tv-race-time" class="tv-font cq-text-5xl font-black text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] truncate w-full text-center tracking-tighter">00:00.0</span>
                 </div>
 
-                <div id="tv-header-p2-container" class="flex flex-col items-end w-1/3 text-right pointer-events-none py-2 min-w-0 pl-2">
-                    <span id="tv-header-p2-name" class="text-orange-400 font-rajdhani font-black cq-text-3xl uppercase truncate w-full tracking-wider drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]">P2</span>
-                    <span id="tv-header-p2-car" class="text-slate-300 font-rajdhani font-bold cq-text-sm truncate w-full opacity-90">-</span>
-                    <span id="tv-header-p2-laps" class="text-orange-300 font-rajdhani font-bold cq-text-2xl mt-1 drop-shadow truncate w-full">V: 0</span>
+                <div id="tv-header-p2-container" class="flex flex-col md:flex-row items-end md:items-center justify-between w-[40%] text-right pointer-events-none py-2 min-w-0 pl-2 gap-2 md:gap-4">
+                    <div class="shrink-0 bg-black/40 border border-orange-500/30 rounded-xl px-4 py-2 shadow-inner md:order-1 order-2">
+                        <span id="tv-header-p2-laps" class="text-orange-300 font-rajdhani font-black cq-text-3xl drop-shadow truncate">V: 0</span>
+                    </div>
+                    <div class="flex flex-col min-w-0 flex-1 md:order-2 order-1 text-right">
+                        <span id="tv-header-p2-name" class="text-orange-400 font-rajdhani font-black cq-text-4xl uppercase truncate w-full tracking-wider drop-shadow-[0_0_8px_rgba(249,115,22,0.5)]">P2</span>
+                        <span id="tv-header-p2-car" class="text-slate-300 font-rajdhani font-bold cq-text-lg truncate w-full opacity-90">-</span>
+                    </div>
                 </div>
             </div>
 
@@ -842,31 +852,31 @@
                 </div>
             </div>
 
-            <div id="w-p1-stats" class="tv-widget tv-panel flex flex-col justify-center p-4 border-l-4 border-yellow-400/50 group">
+            <div id="w-p1-stats" class="tv-widget tv-panel flex flex-col justify-start p-3 sm:p-4 border-l-4 border-yellow-400/50 group">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span class="relative z-10 shrink-0 text-yellow-400 font-rajdhani font-bold mb-2 border-b border-slate-700 pb-1 uppercase tracking-widest cq-text-sm pointer-events-none drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] w-full truncate" data-lang-key="tv_stats_gold">Estadísticas Oro</span>
-                <div class="grid grid-cols-2 gap-1 sm:gap-2 mt-1 pointer-events-none w-full min-h-0 flex-1 content-center">
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_laps">VUELTAS</span><span id="tv-p1-laps" class="font-bold text-white tv-font cq-text-lg truncate block">0</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_consistency">CONSISTENCIA</span><span id="tv-p1-cons" class="font-bold text-blue-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] truncate block">--%</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_best">MEJOR</span><span id="tv-p1-best" class="font-bold text-green-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(74,222,128,0.5)] truncate block">--.---</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_last">ÚLTIMA</span><span id="tv-p1-last" class="font-bold text-white tv-font cq-text-lg truncate block">--.---</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_avg_spd">VEL. MED</span><span id="tv-p1-spd" class="font-bold text-white tv-font cq-text-lg truncate block">--.-</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_max_spd">VEL. MÁX</span><span id="tv-p1-max" class="font-bold text-purple-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(192,132,252,0.5)] truncate block">--.-</span></div>
+                <span class="relative z-10 shrink-0 text-yellow-400 font-rajdhani font-bold mb-2 border-b-2 border-slate-700/50 pb-1 uppercase tracking-widest text-sm sm:text-base pointer-events-none drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] w-full truncate" data-lang-key="tv_stats_gold">Estadísticas Oro</span>
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 sm:gap-y-2 mt-1 pointer-events-none w-full min-h-0 flex-1 content-between overflow-hidden">
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_laps">VUELTAS</span><span id="tv-p1-laps" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">0</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_consistency">CONSISTENCIA</span><span id="tv-p1-cons" class="font-bold text-blue-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] truncate block leading-none">--%</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_best">MEJOR</span><span id="tv-p1-best" class="font-bold text-green-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(74,222,128,0.5)] truncate block leading-none">--.---</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_last">ÚLTIMA</span><span id="tv-p1-last" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">--.---</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_avg_spd">VEL. MED</span><span id="tv-p1-spd" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">--.-</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_max_spd">VEL. MÁX</span><span id="tv-p1-max" class="font-bold text-purple-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(192,132,252,0.5)] truncate block leading-none">--.-</span></div>
                 </div>
             </div>
 
-            <div id="w-p2-stats" class="tv-widget tv-panel flex flex-col justify-center p-4 border-l-4 border-orange-500/50 group">
+            <div id="w-p2-stats" class="tv-widget tv-panel flex flex-col justify-start p-3 sm:p-4 border-l-4 border-orange-500/50 group">
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-orange-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
-                <span class="relative z-10 shrink-0 text-orange-400 font-rajdhani font-bold mb-2 border-b border-slate-700 pb-1 uppercase tracking-widest cq-text-sm pointer-events-none drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] w-full truncate" data-lang-key="tv_stats_copper">Estadísticas Cobre</span>
-                <div class="grid grid-cols-2 gap-1 sm:gap-2 mt-1 pointer-events-none w-full min-h-0 flex-1 content-center">
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_laps">VUELTAS</span><span id="tv-p2-laps" class="font-bold text-white tv-font cq-text-lg truncate block">0</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_consistency">CONSISTENCIA</span><span id="tv-p2-cons" class="font-bold text-blue-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] truncate block">--%</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_best">MEJOR</span><span id="tv-p2-best" class="font-bold text-green-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(74,222,128,0.5)] truncate block">--.---</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_last">ÚLTIMA</span><span id="tv-p2-last" class="font-bold text-white tv-font cq-text-lg truncate block">--.---</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_avg_spd">VEL. MED</span><span id="tv-p2-spd" class="font-bold text-white tv-font cq-text-lg truncate block">--.-</span></div>
-                    <div class="min-w-0"><span class="text-slate-400 block cq-text-xs font-bold truncate" data-lang-key="tv_max_spd">VEL. MÁX</span><span id="tv-p2-max" class="font-bold text-purple-400 tv-font cq-text-lg drop-shadow-[0_0_5px_rgba(192,132,252,0.5)] truncate block">--.-</span></div>
+                <span class="relative z-10 shrink-0 text-orange-400 font-rajdhani font-bold mb-2 border-b-2 border-slate-700/50 pb-1 uppercase tracking-widest text-sm sm:text-base pointer-events-none drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] w-full truncate" data-lang-key="tv_stats_copper">Estadísticas Cobre</span>
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 sm:gap-y-2 mt-1 pointer-events-none w-full min-h-0 flex-1 content-between overflow-hidden">
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_laps">VUELTAS</span><span id="tv-p2-laps" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">0</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_consistency">CONSISTENCIA</span><span id="tv-p2-cons" class="font-bold text-blue-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(96,165,250,0.5)] truncate block leading-none">--%</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_best">MEJOR</span><span id="tv-p2-best" class="font-bold text-green-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(74,222,128,0.5)] truncate block leading-none">--.---</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_last">ÚLTIMA</span><span id="tv-p2-last" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">--.---</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_avg_spd">VEL. MED</span><span id="tv-p2-spd" class="font-bold text-white tv-font cq-text-2xl truncate block leading-none">--.-</span></div>
+                    <div class="min-w-0 flex flex-col justify-center"><span class="text-slate-400 block cq-text-sm font-bold tracking-widest truncate mb-0.5" data-lang-key="tv_max_spd">VEL. MÁX</span><span id="tv-p2-max" class="font-bold text-purple-400 tv-font cq-text-2xl drop-shadow-[0_0_5px_rgba(192,132,252,0.5)] truncate block leading-none">--.-</span></div>
                 </div>
             </div>
 
@@ -910,19 +920,19 @@
                 <div class="drag-handle absolute top-3 right-3 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-slate-400 hover:text-yellow-400 z-20 p-2 -m-2 cursor-move"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>
                 <div class="resize-widget-handle"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v4"/><path d="M13 11V8a2 2 0 0 1 4 0v3"/><path d="M17 12v-1a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-5.1-3l-2.4-3.6a2 2 0 0 1 3.3-2.2l4.2 2.8V5a2 2 0 0 1 4 0v6"/></svg></div>
                 <div class="bg-slate-800/50 p-2 border-b border-slate-700/50 shrink-0 text-center pointer-events-none">
-                    <h3 class="text-slate-300 font-rajdhani font-bold uppercase tracking-widest cq-text-sm truncate" data-lang-key="tv_history">Historial Cara a Cara</h3>
+                    <h3 class="text-slate-300 font-rajdhani font-bold uppercase tracking-widest cq-text-md truncate" data-lang-key="tv_history">Historial Cara a Cara</h3>
                 </div>
                 <div class="flex-1 overflow-y-auto p-2 tv-scrollbar min-h-0 w-full pointer-events-none">
                     <table class="w-full text-left table-fixed">
                         <thead class="sticky top-0 bg-slate-800/90 backdrop-blur z-10">
                             <tr>
-                                <th class="py-1 px-1 text-slate-400 font-rajdhani cq-text-xs w-[15%] truncate" data-lang-key="tv_col_v">V</th>
-                                <th class="py-1 px-1 text-yellow-400 font-rajdhani cq-text-xs w-[30%] truncate">P1</th>
-                                <th class="py-1 px-1 text-orange-400 font-rajdhani cq-text-xs w-[30%] truncate">P2</th>
-                                <th class="py-1 px-1 text-slate-400 font-rajdhani cq-text-xs text-right w-[25%] truncate" data-lang-key="tv_diff">DIF</th>
+                                <th class="py-2 px-1 text-slate-400 font-rajdhani cq-text-md text-center w-[15%] truncate" data-lang-key="tv_col_v">V</th>
+                                <th class="py-2 px-1 text-yellow-400 font-rajdhani cq-text-md text-center w-[25%] truncate">P1</th>
+                                <th class="py-2 px-1 text-orange-400 font-rajdhani cq-text-md text-center w-[25%] truncate">P2</th>
+                                <th class="py-2 px-1 text-slate-400 font-rajdhani cq-text-md text-right w-[35%] truncate" data-lang-key="tv_diff">DIF</th>
                             </tr>
                         </thead>
-                        <tbody id="tv-lap-tbody" class="tv-font text-slate-200 cq-text-sm"></tbody>
+                        <tbody id="tv-lap-tbody" class="tv-font text-slate-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -2857,14 +2867,14 @@
                         tr.className = 'border-b border-slate-700/50 hover:bg-slate-700/30';
                         const t1 = p1Laps[i] ? formatTime(p1Laps[i]) : '-';
                         const t2 = (p2Laps && p2Laps[i]) ? formatTime(p2Laps[i]) : '-';
-                        let dif = '<td class="py-1 px-1 cq-text-xs text-right text-slate-500 truncate">-</td>';
+                        let dif = '<td class="py-2 px-1 cq-text-lg font-bold text-right text-slate-500 truncate">-</td>';
                         if (p1Laps[i] && p2Laps && p2Laps[i]) {
                             const d = p1Laps[i] - p2Laps[i];
-                            if (d < 0) dif = `<td class="py-1 px-1 cq-text-xs text-right text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] truncate">P1 -${(Math.abs(d)/1000).toFixed(3)}</td>`;
-                            else if (d > 0) dif = `<td class="py-1 px-1 cq-text-xs text-right text-orange-400 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] truncate">P2 -${(d/1000).toFixed(3)}</td>`;
-                            else dif = `<td class="py-1 px-1 cq-text-xs text-right text-slate-400 truncate">0.000</td>`;
+                            if (d < 0) dif = `<td class="py-2 px-1 cq-text-lg font-bold text-right text-yellow-400 drop-shadow-[0_0_5px_rgba(250,204,21,0.5)] truncate">P1 -${(Math.abs(d)/1000).toFixed(3)}</td>`;
+                            else if (d > 0) dif = `<td class="py-2 px-1 cq-text-lg font-bold text-right text-orange-400 drop-shadow-[0_0_5px_rgba(249,115,22,0.5)] truncate">P2 -${(d/1000).toFixed(3)}</td>`;
+                            else dif = `<td class="py-2 px-1 cq-text-lg font-bold text-right text-slate-400 truncate">0.000</td>`;
                         }
-                        tr.innerHTML = `<td class="py-1 px-1 cq-text-xs text-slate-400 truncate">${i+1}</td><td class="py-1 px-1 cq-text-xs text-yellow-400 truncate">${t1}</td><td class="py-1 px-1 cq-text-xs text-orange-400 truncate">${tvData.activePlayers===2?t2:''}</td>${tvData.activePlayers===2?dif:''}`;
+                        tr.innerHTML = `<td class="py-2 px-1 cq-text-lg font-bold text-center text-slate-400 truncate">${i+1}</td><td class="py-2 px-1 cq-text-lg font-bold text-center text-yellow-400 truncate">${t1}</td><td class="py-2 px-1 cq-text-lg font-bold text-center text-orange-400 truncate">${tvData.activePlayers===2?t2:''}</td>${tvData.activePlayers===2?dif:''}`;
                         tbody.appendChild(tr);
                     }
                     
