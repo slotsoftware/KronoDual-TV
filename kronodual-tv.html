@@ -3019,6 +3019,8 @@
             startRace(); 
         };
         document.getElementById('reset-race-btn').onclick = () => { 
+            if(typeof updateGarageCarStatsAfterRace === 'function') updateGarageCarStatsAfterRace();
+
             isRaceActive = false; 
             isPaused = false; 
             isCountdown = false;
@@ -4329,40 +4331,44 @@
                     
                     const activeCarName = document.getElementById(p.carId).value;
                     const activePilotName = document.getElementById(p.nameId).value; 
-                    if (!activeCarName) return;
-                    
-                    let carIndex = garageCars.findIndex(c => {
-                        const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                        return cName === activeCarName;
-                    });
-                    
-                    if (carIndex === -1) return;
-                    let car = garageCars[carIndex];
-                    
-                    let currentBest = parseFloat(car.bestLap) || Infinity;
-                    let raceBest = p.bestLap / 1000;
-                    if (raceBest > 0 && raceBest < currentBest) {
-                        car.bestLap = raceBest.toFixed(3) + "s";
-                        car.drivenBy = activePilotName; 
-                    } else if (!car.drivenBy) {
-                        car.drivenBy = activePilotName; 
-                    }
-                    
-                    let rawTime = car._rawTotalTime || 0;
-                    if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s" && car.totalTime !== "-") {
-                        let h = 0, m = 0, s = 0;
-                        let hMatch = car.totalTime.match(/(\d+)h/);
-                        let mMatch = car.totalTime.match(/(\d+)m/);
-                        let sMatch = car.totalTime.match(/(\d+(?:\.\d+)?)s/);
-                        if (hMatch) h = parseInt(hMatch[1]);
-                        if (mMatch) m = parseInt(mMatch[1]);
-                        if (sMatch) s = parseFloat(sMatch[1]);
-                        rawTime = (h * 3600000) + (m * 60000) + (s * 1000);
-                    }
-                    rawTime += p.totalTime; 
-                    car._rawTotalTime = rawTime;
-                    
-                    let totalSecs = Math.floor(rawTime / 1000);
+                if (!activeCarName) return;
+                
+                let carIndex = garageCars.findIndex(c => {
+                    const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                    return cName === activeCarName.trim();
+                });
+                
+                if (carIndex === -1) return;
+                let car = garageCars[carIndex];
+                
+                let currentBestStr = car.bestLap ? String(car.bestLap).replace('s', '').replace(',', '.') : '';
+                let currentBest = parseFloat(currentBestStr) || Infinity;
+                
+                let raceBest = p.bestLap / 1000;
+                if (raceBest > 0 && raceBest < currentBest) {
+                    car.bestLap = raceBest.toFixed(3) + "s";
+                    car.drivenBy = activePilotName; 
+                } else if (!car.drivenBy) {
+                    car.drivenBy = activePilotName; 
+                }
+                
+                let rawTime = car._rawTotalTime || 0;
+                if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s" && car.totalTime !== "-") {
+                    let h = 0, m = 0, s = 0;
+                    let hMatch = car.totalTime.match(/(\d+)h/);
+                    let mMatch = car.totalTime.match(/(\d+)m/);
+                    let sMatch = car.totalTime.match(/(\d+(?:\.\d+)?)s/);
+                    if (hMatch) h = parseInt(hMatch[1]);
+                    if (mMatch) m = parseInt(mMatch[1]);
+                    if (sMatch) s = parseFloat(sMatch[1]);
+                    rawTime = (h * 3600000) + (m * 60000) + (s * 1000);
+                }
+                
+                let sessionTime = p.lapHistory.reduce((a,b) => a+b, 0);
+                rawTime += sessionTime; 
+                car._rawTotalTime = rawTime;
+                
+                let totalSecs = Math.floor(rawTime / 1000);
                     let h = Math.floor(totalSecs / 3600);
                     let m = Math.floor((totalSecs % 3600) / 60);
                     let s = totalSecs % 60;
