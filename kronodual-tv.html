@@ -4473,6 +4473,15 @@
                         car.imageId = imgId; 
                         car.image = ""; 
                         
+                        // FIX: Capturar los textos que el usuario está tecleando antes de que la nube refresque la pantalla
+                        if (isGarageEditing) {
+                            car.name = document.getElementById('g-inp-name').value || "Coche Sin Nombre";
+                            garageFields.forEach(f => {
+                                const inpEl = document.getElementById(`g-inp-${f}`);
+                                if (inpEl) car[f] = inpEl.value;
+                            });
+                        }
+                        
                         ImageDB.save(imgId, base64Str);
                         document.getElementById('garage-img').src = base64Str;
                         
