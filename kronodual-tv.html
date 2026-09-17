@@ -1565,9 +1565,14 @@
             updateLapCountersUI();
             localStorage.setItem('krono_lang', lang); triggerCloudSync();
         }
+
         function speak(textKey, suffix = "") {
             if (isTVMode && (!tvData || !tvData.voiceEnabled)) return;
             if (!isTVMode && !voiceToggle.checked) return;
+            
+            // TRUCO ANTIBLOQUEO: Vaciar la cola de voz del navegador para que no se atasque
+            window.speechSynthesis.cancel();
+            
             const t = translations[currentLang] || translations['es'];
             let msgText = (t[textKey] || textKey) + suffix;
             const utter = new SpeechSynthesisUtterance(msgText);
@@ -1584,6 +1589,10 @@
         function speakDirect(text) {
             if (isTVMode && (!tvData || !tvData.voiceEnabled)) return;
             if (!isTVMode && !voiceToggle.checked) return;
+            
+            // TRUCO ANTIBLOQUEO: Vaciar la cola de voz
+            window.speechSynthesis.cancel();
+            
             const utter = new SpeechSynthesisUtterance(text);
             if (currentLang === 'es') utter.lang = 'es-ES';
             else if (currentLang === 'fr') utter.lang = 'fr-FR';
@@ -1680,29 +1689,29 @@
             document.querySelectorAll('.movable-rectangle').forEach(el => el.style.display = 'none');
             cameraOnBtn.disabled = false; cameraOffBtn.disabled = true; 
             
-            document.getElementById('calib-p1-btn').disabled = true;
-            if (document.getElementById('calib-p2-btn')) document.getElementById('calib-p2-btn').disabled = true;
-
-            document.getElementById('cam-controls').classList.add('opacity-50', 'pointer-events-none');
-            videoStatus.textContent = translations[currentLang] ? translations[currentLang].video_status_off : "Apagada";
+            const wName = document.getElementById(winner.nameId).value;
+            const t = translations[currentLang];
+            const finalWinnerText = activePlayers===1 ? t.completed : `${t.winner} ${wName}`;
+            document.getElementById('winner-text').textContent = finalWinnerText;
             
-            const headerPanel = document.getElementById('app-header-panel');
-            const timesPanel = document.getElementById('times-traffic-panel');
-            if(headerPanel) { headerPanel.classList.remove('hidden'); headerPanel.classList.add('flex'); }
-            if(timesPanel) { timesPanel.classList.remove('hidden'); timesPanel.classList.add('flex'); }
-        }
-
-        function processVideo() {
-            if (!isProcessing || isTVMode) return;
+            // NUEVO: GUARDAR EN EL HISTORIAL
+            try {
+                let historyData = JSON.parse(localStorage.getItem('krono_race_history')) || [];
+                // Guardar la carrera actual
+                historyData.push({
+                    timestamp: Date.now(),
+                    winner: finalWinnerText,
+                    totalLaps: winner.laps, // Guardar las vueltas del ganador (o de la carrera)
+                    mode: raceMode
+                });
+                // Mantener solo las últimas 50 carreras para no saturar memoria
+                if(historyData.length > 50) historyData.shift();
+                localStorage.setItem('krono_race_history', JSON.stringify(historyData));
+            } catch(e) {
+                console.error("Error guardando carrera en el historial", e);
+            }
             
-            const now = Date.now();
-            const pitTimeEl = document.getElementById('pit-time-select');
-            const pitSeconds = pitTimeEl ? parseInt(pitTimeEl.value) : 4;
-            const pitFramesRequired = pitSeconds * 30; 
-            const autoResetFrames = pitFramesRequired + 60; 
-
-            const canvasCtx = canvas.getContext('2d', { willReadFrequently: true });
-            canvasCtx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            const trackLen = parseFloat(trackLengthInput.value) || 15;
 
             players.forEach(p => {
                 if (p.id > activePlayers) return;
@@ -2134,7 +2143,11 @@
             if (lapSpeed > p.maxSpeed) p.maxSpeed = lapSpeed;
 
             let isNewRecord = false; if (lapTime < p.bestLap) { p.bestLap = lapTime; recordNotification.classList.add('show'); setTimeout(()=>recordNotification.classList.remove('show'),2000); isNewRecord = true; }
+            
+            // TRUCO AUDIO: Despertar el AudioContext si el navegador lo ha dormido para que no se encasquille
+            if (Tone.context.state !== 'running') Tone.context.resume();
             polySynth.triggerAttackRelease(p.soundTone, "0.1", Tone.now()); 
+            
             updatePlayerUI(p);
             if (activePlayers === 2) updateGaps(); 
             
@@ -3220,6 +3233,7 @@
                 rankingBody.innerHTML = `<div class="text-center p-4 text-slate-400 font-rajdhani tracking-widest bg-slate-900/80 rounded-lg backdrop-blur-sm mt-10">No hay tiempos registrados en el garaje aún. ¡Sal a la pista!</div>`;
             } else {
                 const leaderLap = validCars[0]._numTime;
+                const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='12' font-weight='900' stroke='none' fill='%2322d3ee' text-anchor='middle' letter-spacing='1' filter='url(%23neonGlow)'%3EPHOTO CAR%3C/text%3E%3C/svg%3E";
 
                 validCars.forEach((c, idx) => {
                     const isLeft = idx % 2 === 0; 
@@ -3233,6 +3247,7 @@
                     let textColor = 'text-slate-200';
                     let subTextColor = 'text-slate-400';
                     let highlightColor = 'text-slate-300';
+                    let imgBorder = 'border-slate-500 shadow-[0_0_10px_rgba(100,116,139,0.3)]';
                     
                     if (idx === 0) {
                         borderGlow = 'border-cyan-400/60 shadow-[0_0_20px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/30 to-slate-900/90';
@@ -3241,6 +3256,7 @@
                         textColor = 'text-white';
                         subTextColor = 'text-cyan-200/80';
                         highlightColor = 'text-cyan-100';
+                        imgBorder = 'border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.5)]';
                     } else if (idx === 1) {
                         borderGlow = 'border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-gradient-to-br from-blue-900/30 to-slate-900/90';
                         posColor = 'text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]';
@@ -3248,6 +3264,7 @@
                         textColor = 'text-blue-50';
                         subTextColor = 'text-blue-300/80';
                         highlightColor = 'text-blue-200';
+                        imgBorder = 'border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]';
                     } else if (idx === 2) {
                         borderGlow = 'border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)] bg-gradient-to-br from-indigo-900/30 to-slate-900/90';
                         posColor = 'text-indigo-400 drop-shadow-[0_0_10px_rgba(99,102,241,0.8)]';
@@ -3255,25 +3272,36 @@
                         textColor = 'text-indigo-50';
                         subTextColor = 'text-indigo-300/80';
                         highlightColor = 'text-indigo-200';
+                        imgBorder = 'border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.5)]';
                     }
 
                     let div = document.createElement('div');
-                    div.className = `w-[90%] md:w-[45%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-4 sm:p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-blue-400/50 group`;
+                    div.className = `w-[90%] md:w-[50%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-4 sm:p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-cyan-400/50 group`;
                     
                     div.innerHTML = `
                         <div class="absolute -top-3 sm:-top-4 ${isLeft ? '-left-2 sm:-left-4' : '-right-2 sm:-right-4'} font-rajdhani font-black text-3xl sm:text-4xl italic ${posColor} z-20 transition-transform duration-300 group-hover:scale-110">
                             P${idx + 1}
                         </div>
                         
-                        <div class="flex flex-col gap-1 mt-1 pl-1">
-                            <span class="${textColor} font-bold font-rajdhani text-lg sm:text-xl truncate tracking-wide group-hover:text-white transition-colors drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]">
-                                ${c.name || 'Desconocido'}
-                            </span>
-                            <span class="${subTextColor} font-medium font-rajdhani text-xs sm:text-sm uppercase tracking-widest truncate">
-                                ${c.marca || ''} ${c.ref || ''} | ${c.cat || '-'}
-                            </span>
+                        <div class="flex flex-col gap-3 mt-2 sm:mt-1">
+                            <div class="flex items-center gap-3 sm:gap-4 pl-1">
+                                <!-- ZONA FOTO DEL COCHE -->
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden border-2 ${imgBorder} relative bg-black/50 transition-all duration-300 group-hover:scale-105">
+                                    <img id="global-rank-img-${idx}" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500 z-10 relative">
+                                    <div class="absolute inset-0 flex items-center justify-center text-slate-500 text-[8px] font-bold tracking-widest text-center z-0" id="global-rank-img-spin-${idx}">FOTO</div>
+                                </div>
+
+                                <div class="flex flex-col gap-1 min-w-0">
+                                    <span class="${textColor} font-bold font-rajdhani text-lg sm:text-xl truncate tracking-wide group-hover:text-white transition-colors drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]">
+                                        ${c.name || 'Desconocido'}
+                                    </span>
+                                    <span class="${subTextColor} font-medium font-rajdhani text-xs sm:text-sm uppercase tracking-widest truncate">
+                                        ${c.marca || ''} ${c.ref || ''} | ${c.cat || '-'}
+                                    </span>
+                                </div>
+                            </div>
                             
-                            <div class="flex justify-between items-end mt-3 pt-3 border-t border-slate-700/60">
+                            <div class="flex justify-between items-end mt-2 pt-3 border-t border-slate-700/60 pl-1">
                                 <div class="flex flex-col">
                                     <span class="text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-1">
                                         Dif: <span class="${highlightColor}">${deltaStr}</span>
@@ -3297,6 +3325,40 @@
                         </div>
                     `;
                     rankingBody.appendChild(div);
+
+                    // CARGA ASÍNCRONA DE LA IMAGEN DEL COCHE
+                    setTimeout(() => {
+                        const imgEl = document.getElementById(`global-rank-img-${idx}`);
+                        const spinEl = document.getElementById(`global-rank-img-spin-${idx}`);
+
+                        const applyImage = (src) => {
+                            if(imgEl) {
+                                imgEl.src = src;
+                                imgEl.onload = () => {
+                                    imgEl.classList.remove('opacity-0');
+                                    if(spinEl) spinEl.style.display = 'none';
+                                };
+                            }
+                        };
+
+                        if (c.imageId) {
+                            ImageDB.get(c.imageId).then(base64 => {
+                                if (base64) applyImage(base64);
+                                else {
+                                    if (typeof fetchImageFromCloud === 'function') {
+                                        fetchImageFromCloud(c.imageId).then(cloudBase64 => {
+                                            if (cloudBase64) {
+                                                ImageDB.save(c.imageId, cloudBase64);
+                                                applyImage(cloudBase64);
+                                            } else applyImage(c.image || defaultImg);
+                                        }).catch(() => applyImage(c.image || defaultImg));
+                                    } else applyImage(c.image || defaultImg);
+                                }
+                            }).catch(() => applyImage(c.image || defaultImg));
+                        } else {
+                            applyImage(c.image || defaultImg);
+                        }
+                    }, 50);
                 });
             }
 
