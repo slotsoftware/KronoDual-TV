@@ -3,12 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KronoDual TV </title>
+    <title>KronoDual TV</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
     <style>
         body { 
-            background: linear-gradient(180deg, #000000 0%, #1c190b 50%, #383008 100%);
+            /* Se ha añadido una imagen de fondo. Asegúrate de subir 'fondo.jpeg' a tu servidor */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(28, 25, 11, 0.8), rgba(56, 48, 8, 0.8)), url('fondo.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-color: #1c190b; /* Fallback color */
             font-family: sans-serif; 
             color: #fff;
         }
@@ -94,6 +102,7 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen overflow-y-auto">
 
     <!-- Modal de Sesión Duplicada -->
@@ -118,6 +127,7 @@
 
         <div class="img-container">
             <div class="aspect-9-16">
+                <!-- Imagen fallback predeterminada de placehold.co ajustada con estilo de KronoDual -->
                 <img id="user-image" src="5.jpeg" 
                      alt="[Imagen de KronoDual Gold]" 
                      class="w-full h-full object-cover"
